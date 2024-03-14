@@ -133,6 +133,15 @@ void init_sched()
 	}
 }
 
+
+void inner_task_switch(union task_union*t)
+{
+	tss.esp0 = KERNEL_ESP(t);
+  writeMSR(0x175, tss.esp0);
+	set_cr3(t->task->dir_pages_baseAddr);
+	inner_task_switch_ass();	
+}
+
 struct task_struct* current()
 {
   int ret_value;

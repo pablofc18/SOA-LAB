@@ -41,6 +41,7 @@ LIBZEOS = -L . -l zeos
 USROBJ = \
 	libc.o \
 	wrappers.o \
+  context_switch.o \
 	# libjp.a \
 
 all:zeos.bin
@@ -67,6 +68,10 @@ entry.s: entry.S $(INCLUDEDIR)/asm.h $(INCLUDEDIR)/segment.h
 
 # added wrapper
 wrappers.s: wrappers.S $(INCLUDEDIR)/asm.h
+	$(CPP) $(ASMFLAGS) -o $@ $<
+
+# added task switch
+context_switch.s: context_switch.S $(INCLUDEDIR)/asm.h
 	$(CPP) $(ASMFLAGS) -o $@ $<
 
 sys_call_table.s: sys_call_table.S $(INCLUDEDIR)/asm.h $(INCLUDEDIR)/segment.h
