@@ -65,6 +65,7 @@ void cpu_idle(void)
 
 void init_idle (void)
 {
+// Comenzamos
 	// es un -> while(1); // nunca sale a user, solo sistema, hay que preparar para q se ejecute contexto de ejecucion, pila de sistema para q idle entre en cpu y qno permita ir a usuario. (Cima pila sistema haya un ebp que pueda recuperar y una dir de retorno a su codigo). Pila sistema no hay context HW SW, solo info minima ebp y @RET. Crear a mano pila <-. ((((Añadir task struct kernel_esp)))). EBP -> 0. @RET -> dir funcion codigo idle cpu_idle (en codigo del kernel). IDLE NUNCA EN LA COLA DE READY. Puntero global a su task union. 
 }
 
