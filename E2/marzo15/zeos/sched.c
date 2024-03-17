@@ -70,10 +70,13 @@ void init_idle (void)
 {
 	// first task struct available 
 	struct list_head *lh = list_first(&freequeue);
+	// delete from fq
+	list_del(lh);	
+	// Get ts
 	struct task_struct *ts = list_head_to_task_struct(lh);
 	// pid = 0
 	ts->PID = 0;
-	// ini dir_pages_baseAddr (&?)
+	// ini dir_pages_baseAddr
 	allocate_DIR(ts);
 	// task_struct -> task_union
 	union task_union *tu = (union task_union*) ts;
@@ -91,6 +94,26 @@ void init_idle (void)
 
 void init_task1(void)
 {
+	// first task struct available 
+	struct list_head *lh = list_first(&freequeue);
+	// delete from fq
+	list_del(lh);	
+	// Get ts
+	struct task_struct *ts = list_head_to_task_struct(lh);
+	// pid = 1
+	ts->PID = 1;
+	// ini dir_pages_baseAddr	
+	allocate_DIR(ts);
+	// ini address spaces
+	set_user_pages(ts);	
+	// TSS -> new_task system stack
+	union task_union *tu = (union task_union *) ts;
+	tss.esp0 = KERNEL_ESP(tu);
+	// msr 0x175 -> stack act proc
+	writeMSR(0x175, tss.esp0);
+	// page dir -> cur page dir in sys
+	set_cr3(ts->dir_pages_baseAddr);
+	
 	// Codigo para crear el proceso a mano, primer proceso de user, tabla pàg proceso: Definir como es ((mm_addres.h)). setuserpages (crea primera tabla pags, llamarla). Prepararlo para indicar que es current(): cr3 -> tabla pag de este proceso. tss.esp0 -> pila sistema de task1 cima. msr 0x175-> pila sistema del proc actual. TASK1 NO SE ENCOLA EN READY QUEUE. 
 }
 
