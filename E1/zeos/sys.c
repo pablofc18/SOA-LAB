@@ -30,9 +30,10 @@ int sys_ni_syscall()
 	return -38; /*ENOSYS*/
 }
 
-int sys_getpid()
+int sys_getpid(void)
 {
-	return current()->PID;
+	//printk("eiou entro a getpiddddd perfectament");
+  return current()->PID;
 }
 
 int sys_fork()
