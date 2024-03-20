@@ -85,7 +85,7 @@ void init_idle (void)
 	// store in the stack the initial value of EBP (0 i. e.)
 	tu->stack[KERNEL_STACK_SIZE-1] = (unsigned long) 0;
 	// pos of stack (in a new field of its task_struct) where ini value of ebp
-	tu->task.kernel_esp = &(tu->stack[KERNEL_STACK_SIZE-1]);
+	tu->task.kernel_esp = tu->stack[KERNEL_STACK_SIZE-1];
 	// initialize idle_task (task struct)
 	idle_task = ts;
 

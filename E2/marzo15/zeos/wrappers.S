@@ -52,6 +52,7 @@ write_no_error:
 	popl %ebx
 	popl %ecx
 	popl %edx
+	popl %ebp
 	ret	
 
 ENTRY(gettime)
