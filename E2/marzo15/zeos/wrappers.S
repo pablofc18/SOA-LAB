@@ -85,3 +85,34 @@ gt_no_error:
 	popl %ebp
 	ret
 
+ENTRY(getpid)
+	pushl %ebp
+	mov %esp,%ebp
+	
+	pushl %edx
+	pushl %ecx
+	
+	movl $20, %eax
+	
+	pushl $gp_return
+	pushl %ebp
+	mov %esp,%ebp
+
+	sysenter
+
+gp_return:
+	popl %ebp
+	add $4, %esp
+	popl %edx
+	popl %ecx
+	cmpl $0, %eax
+	jge gp_no_error
+	
+  negl %eax # Negamos EAX para obtener el valor absoluto
+	movl %eax, errno
+	movl -1, %eax
+
+gp_no_error:
+	popl %ebp
+	ret
+
