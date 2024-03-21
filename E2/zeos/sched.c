@@ -134,12 +134,15 @@ void init_sched()
 }
 
 
+void inner_task_switch_ass(unsigned long *currkernesp, unsigned long newkernesp);
+
 void inner_task_switch(union task_union*t)
 {
 	tss.esp0 = KERNEL_ESP(t);
   writeMSR(0x175, tss.esp0);
-	set_cr3(t->task->dir_pages_baseAddr);
-	inner_task_switch_ass();	
+	set_cr3(t->task.dir_pages_baseAddr);
+	// dos params -> curr kern esp | new kern esp
+	inner_task_switch_ass(&(current()->kernel_esp), t->task.kernel_esp);	
 }
 
 struct task_struct* current()

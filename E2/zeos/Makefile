@@ -34,6 +34,7 @@ SYSOBJ = \
 	utils.o \
 	hardware.o \
 	list.o \
+  context_switch.o \
 
 LIBZEOS = -L . -l zeos
 
@@ -41,7 +42,6 @@ LIBZEOS = -L . -l zeos
 USROBJ = \
 	libc.o \
 	wrappers.o \
-  context_switch.o \
 	# libjp.a \
 
 all:zeos.bin

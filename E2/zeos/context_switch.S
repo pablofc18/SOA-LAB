@@ -14,6 +14,7 @@ ENTRY(task_switch)
 	# call inner
 	call inner_task_switch
 
+	# restore regs
 	popl %edi
 	popl %ebx
 	popl %esi
@@ -21,5 +22,13 @@ ENTRY(task_switch)
 	popl %ebp
 	ret	
 
+
 ENTRY(inner_task_switch_ass)
-	#store current ebp to pcb.
+	# store current ebp to pcb.
+	mov %ebp, 0x8(%ebp)
+	# esp <- new pcb
+	mov 0xc(%ebp), %esp
+	# restore ebp
+	popl %ebp
+	# ret new
+	ret

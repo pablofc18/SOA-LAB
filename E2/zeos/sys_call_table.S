@@ -7,7 +7,7 @@ ENTRY (sys_call_table)
 	.long sys_ni_syscall//2
 	.long sys_ni_syscall//3
 	.long sys_write//4
-  .long sys_ni_syscall//5
+	.long sys_ni_syscall//5
 	.long sys_ni_syscall//6
 	.long sys_ni_syscall//7
 	.long sys_ni_syscall//8
@@ -17,7 +17,7 @@ ENTRY (sys_call_table)
 	.long sys_ni_syscall//12
 	.long sys_ni_syscall//13
 	.long sys_ni_syscall//14
-  .long sys_ni_syscall//15
+	.long sys_ni_syscall//15
 	.long sys_ni_syscall//16
 	.long sys_ni_syscall//17
 	.long sys_ni_syscall//18
