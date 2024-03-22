@@ -20,6 +20,7 @@ void syscall_handler_sysenter();
 
 void writeMSR(unsigned long msr_val, unsigned long value);
 extern int zeos_ticks;
+extern struct task_struct *idle_task;
 
 char char_map[] =
 {
@@ -114,6 +115,7 @@ void keyboard_routine(void)
 	if (ch == '\0') ch = 'C';
     printc_xy(5,6,ch);
   }  
+	task_switch((union task_union*)idle_task);
 }
 
 

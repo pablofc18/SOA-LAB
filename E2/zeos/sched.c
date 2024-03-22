@@ -81,11 +81,11 @@ void init_idle (void)
 	// task_struct -> task_union
 	union task_union *tu = (union task_union*) ts;
 	// store in the stack the @ cpu_idle function
-	tu->stack[KERNEL_STACK_SIZE-2] = (unsigned long) cpu_idle;
+	tu->stack[KERNEL_STACK_SIZE-1] = (unsigned long) cpu_idle;
 	// store in the stack the initial value of EBP (0 i. e.)
-	tu->stack[KERNEL_STACK_SIZE-1] = (unsigned long) 0;
+	tu->stack[KERNEL_STACK_SIZE-2] = (unsigned long) 0;
 	// pos of stack (in a new field of its task_struct) where ini value of ebp
-	tu->task.kernel_esp = tu->stack[KERNEL_STACK_SIZE-1];
+	tu->task.kernel_esp = (unsigned long) &(tu->stack[KERNEL_STACK_SIZE-2]);
 	// initialize idle_task (task struct)
 	idle_task = ts;
 
@@ -142,7 +142,9 @@ void inner_task_switch(union task_union*t)
   writeMSR(0x175, tss.esp0);
 	set_cr3(t->task.dir_pages_baseAddr);
 	// dos params -> curr kern esp | new kern esp
-	inner_task_switch_ass(&(current()->kernel_esp), t->task.kernel_esp);	
+	unsigned long *curkeresp = &(current()->kernel_esp);
+	unsigned long newkeresp = t->task.kernel_esp;
+	inner_task_switch_ass(curkeresp, newkeresp);	
 }
 
 struct task_struct* current()

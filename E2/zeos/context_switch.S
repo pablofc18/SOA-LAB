@@ -1,7 +1,7 @@
 #include <asm.h>
 
 ENTRY(task_switch)
-	popl %ebp
+	pushl %ebp
 	mov %esp, %ebp
 	
 	# save regs
@@ -14,6 +14,8 @@ ENTRY(task_switch)
 	# call inner
 	call inner_task_switch
 
+	# quitar param
+	add $0x4, %esp
 	# restore regs
 	popl %edi
 	popl %ebx
@@ -24,11 +26,9 @@ ENTRY(task_switch)
 
 
 ENTRY(inner_task_switch_ass)
-	# store current ebp to pcb.
-	mov %ebp, 0x8(%ebp)
-	# esp <- new pcb
-	mov 0xc(%ebp), %esp
-	# restore ebp
+	#mov %ebp, 0x4(%esp)
+	mov 0x4(%esp), %ebx
+	mov %ebp, (%ebx)
+	mov 0x8(%esp), %esp
 	popl %ebp
-	# ret new
 	ret
