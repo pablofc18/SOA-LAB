@@ -1,4 +1,5 @@
 #include <libc.h>
+#include <errno.h>
 
 char buff[24];
 
@@ -11,7 +12,7 @@ int __attribute__ ((__section__(".text.main")))
      /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
   char * msg = "";
   int pid = getpid();
-  itoa(pid,msg);
-  write(1,msg,strlen(msg));
+ 	itoa(pid,msg);
+	write(1,msg,strlen(msg));
   while(1) {}
 }

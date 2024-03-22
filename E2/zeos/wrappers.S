@@ -43,7 +43,6 @@ write_ret:
 	jge write_no_error
 
 	# Si hay error:
-	negl %eax 	# Negamos EAX para obtener el valor absoluto
 	movl %eax, errno # Pasamos valor a errno y asignamos -1 a eax para user
 	movl -1, %eax
 
@@ -78,7 +77,6 @@ gt_return:
 	cmpl $0, %eax
 	jge gt_no_error
 	
-  negl %eax # Negamos EAX para obtener el valor absoluto
 	movl %eax, errno
 	movl -1, %eax
 
@@ -104,16 +102,49 @@ ENTRY(getpid)
 gp_return:
 	popl %ebp
 	add $4, %esp
-	popl %edx
 	popl %ecx
+	popl %edx
 	cmpl $0, %eax
 	jge gp_no_error
 	
-  negl %eax # Negamos EAX para obtener el valor absoluto
 	movl %eax, errno
 	movl -1, %eax
 
 gp_no_error:
 	popl %ebp
 	ret
+
+
+ENTRY(fork)
+	pushl %ebp
+	mov %esp, %ebp
+	
+	# save for user stack
+	pushl %edx
+	pushl %ecx
+
+	# sys call n2
+	mov $0x2, %eax
+	
+	pushl $f_ret
+	pushl %ebp
+	mov %esp, %ebp
+
+	sysenter
+
+f_ret: 
+	pop %ebp
+	add $4, %esp
+	pop %ecx
+	pop %edx
+	cmpl $0, %eax
+	jge f_no_err
+		
+	mov %eax, errno
+	mov $-1, %eax
+
+f_no_err:
+	pop %ebp
+	ret
+
 

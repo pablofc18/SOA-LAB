@@ -140,7 +140,7 @@ void inner_task_switch(union task_union*t)
 {
 	tss.esp0 = KERNEL_ESP(t);
   writeMSR(0x175, tss.esp0);
-	set_cr3(t->task.dir_pages_baseAddr);
+	set_cr3(get_DIR(&(t->task)));
 	// dos params -> curr kern esp | new kern esp
 	unsigned long *curkeresp = &(current()->kernel_esp);
 	unsigned long newkeresp = t->task.kernel_esp;
