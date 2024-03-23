@@ -102,6 +102,9 @@ void init_task1(void)
 	struct task_struct *ts = list_head_to_task_struct(lh);
 	// pid = 1
 	ts->PID = 1;
+  // inicialitzem el quantum a 10 ES UNA PROVA PER COMPROVAR QUE FUNCIONEN SET_QUANTUM I GET_QUANTUM;
+  
+	ts->quantum = 10;
 	// ini dir_pages_baseAddr	
 	allocate_DIR(ts);
 	// ini address spaces
@@ -157,4 +160,12 @@ struct task_struct* current()
   );
   return (struct task_struct*)(ret_value&0xfffff000);
 }
+int get_quantum (struct task_struct *t)
+{
+  return t->quantum;
+}
 
+void set_quantum(struct task_struct *t,int new_quantum)
+{
+  t->quantum = new_quantum;
+}
