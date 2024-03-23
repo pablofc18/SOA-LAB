@@ -74,7 +74,7 @@ int sys_fork()
 			// put the ts again on the free queue
 			list_add_tail(lh, &freequeue);
 			// return error 
-			return -¿;
+			return -ENOMEM;
 		}
 	}
 
@@ -87,9 +87,15 @@ int sys_fork()
 	// copy code pages from parent
 	for(page = 0; page < NUM_PAG_CODE; ++page) {
 		// pages from PAG_LOG_INIT_CODE to PAG_LOG_INIT_CODE + NUM_PAGE_CODE
-		set_ss_pag(childPagTab, PAG_LOG_INIT_CODE+page, get_frame(parentPagTab, PAG_LOG_INIT_CODE+pag);
+		set_ss_pag(childPagTab, PAG_LOG_INIT_CODE+page, get_frame(parentPagTab, PAG_LOG_INIT_CODE+page));
 	}
 	// copy data from parent, we need tmp logical page
+	for(page = NUM_PAG_KERNEL+NUM_PAG_CODE; page < NUM_PAG_KERNEL+NUM_PAG_CODE+NUM_PAG_DATA; ++page) {
+		set_ss_pag(parentPagTab, page+NUM_PAG_DATA, get_frame(childPagTab, page);
+		// shift <<12 for 0x...000 and @ (void*) -> [ej en system.c (linia 98)]
+		copy_data((void *) (page<<12), (void *) ((page+NUM_PAG_DATA)<<12), PAGE_SIZE);
+		del_ss_pag(parentPagTab, page+NUM_PAG_DATA);	
+	}
 	
 	// flush tlb
 	set_cr3(get_DIR(current()));

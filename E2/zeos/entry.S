@@ -75,9 +75,8 @@
 
 ENTRY(keyboard_handler)
 	SAVE_ALL
-	EOI
 	call keyboard_routine
-	#EOI
+	EOI
 	RESTORE_ALL
 	iret;
 
