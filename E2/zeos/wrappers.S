@@ -126,6 +126,7 @@ ENTRY(fork)
 	# sys call n2
 	mov $0x2, %eax
 	
+	# fake dyn link
 	pushl $f_ret
 	pushl %ebp
 	mov %esp, %ebp
@@ -140,6 +141,7 @@ f_ret:
 	cmpl $0, %eax
 	jge f_no_err
 		
+	# errno
 	mov %eax, errno
 	mov $-1, %eax
 
