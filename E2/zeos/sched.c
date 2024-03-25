@@ -211,6 +211,10 @@ void sched_next_rr(void)
   task_switch(next);
 }
 void schedule(){
+  int pid = current()->PID;
+  char * msg;
+  itoa(msg, pid);
+  printk(msg);
   update_sched_data_rr();
   if(needs_sched_rr()){
     update_process_state_rr(current(), &readyqueue);
