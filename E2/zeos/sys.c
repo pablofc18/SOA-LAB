@@ -35,12 +35,27 @@ int sys_getpid()
 	return current()->PID;
 }
 
+extern struct list_head freequeue;
+
 int sys_fork()
 {
   int PID=-1;
-
   // creates the child process
   
+	// check free free queue if no space error ENOMEM
+	if (list_empty(&freequeue)) return -ENOMEM;	
+	// get first elem
+	struct list_head *lh = list_first(&freequeue);
+	list_del(lh);	
+	// inherit the parent's task union
+	struct task_struct *ts = list_head_to_task_struct(lh);
+	union task_union *child = (union task_union*) ts;
+	copy_data(current(), child, sizeof(union task_union));
+	// get new page dir and ini dirpagAddr with allocate dir
+	allocate_DIR(&(child->task));	
+	// [+] allocate antes que get PT [+]
+	page_table_entry *childPagTab = get_PT(&(child->task));
+	
   return PID;
 }
 
