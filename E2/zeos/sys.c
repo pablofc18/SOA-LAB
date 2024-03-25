@@ -78,8 +78,5 @@ int sys_write(int fd, char * buffer, int size)
 } 
 
 int sys_gettime(void){
-  int q = get_quantum(*current);
- 
-  
 	return zeos_ticks;
 }

@@ -29,6 +29,8 @@ extern struct list_head blocked;
 struct list_head freequeue;
 struct list_head readyqueue;
 
+int quantum_ticks;
+
 // DECLARAMOS idle_task
 struct task_struct *idle_task;
 
@@ -76,6 +78,7 @@ void init_idle (void)
 	struct task_struct *ts = list_head_to_task_struct(lh);
 	// pid = 0
 	ts->PID = 0;
+	ts->quantum = QUANTUM;
 	// ini dir_pages_baseAddr
 	allocate_DIR(ts);
 	// task_struct -> task_union
@@ -102,9 +105,7 @@ void init_task1(void)
 	struct task_struct *ts = list_head_to_task_struct(lh);
 	// pid = 1
 	ts->PID = 1;
-  // inicialitzem el quantum a 10 ES UNA PROVA PER COMPROVAR QUE FUNCIONEN SET_QUANTUM I GET_QUANTUM;
-  
-	ts->quantum = 10;
+	ts->quantum = QUANTUM;
 	// ini dir_pages_baseAddr	
 	allocate_DIR(ts);
 	// ini address spaces
@@ -168,4 +169,51 @@ int get_quantum (struct task_struct *t)
 void set_quantum(struct task_struct *t,int new_quantum)
 {
   t->quantum = new_quantum;
+}
+
+void update_sched_data_rr()
+{
+  --quantum_ticks;
+}
+
+int needs_sched_rr()
+{
+  if(quantum_ticks > 0) return 0;
+  if(list_empty(&readyqueue)){
+    quantum_ticks = get_quantum(current());
+    return 0;
+  }
+  return 1;
+}
+
+update_process_state_rr(struct task_struct *t, struct list_ead *dst_queue)
+{
+  struct list_head * tmp = &t->list;
+  if(!(tmp->prev == NULL && tmp->next == NULL))
+  {
+    list_del(tmp);
+  }
+  if(dst_queue) list_add_tail(tmp, dst_queue);
+}
+
+void sched_next_rr(void)
+{
+  struct task_struct *next;
+  if(!list_empty(&readyqueue))
+  {
+    struct list_gead *lf = list_first(&readyqueue);
+    list_del(lf);
+    next = list_head_to_task_struct(lf);
+  }else{
+    next = idle_task;
+  }
+  quantum_ticks = get_quantum(next);
+  task_switch(next);
+}
+void schedule(){
+  update_sched_data_rr();
+  if(needs_sched_rr()){
+    update_process_state_rr(current(), &readyqueue);
+    sched_next_rr();
+  }
 }
