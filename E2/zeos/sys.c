@@ -55,6 +55,7 @@ int sys_fork()
 	allocate_DIR(&(child->task));	
 	// [+] allocate antes que get PT [+]
 	page_table_entry *childPagTab = get_PT(&(child->task));
+	//
 	
   return PID;
 }
