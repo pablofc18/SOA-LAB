@@ -33,6 +33,8 @@ int quantum_ticks;
 
 // DECLARAMOS idle_task
 struct task_struct *idle_task;
+// DECLARAMOS init_task
+struct task_struct *init_task;
 
 /* get_DIR - Returns the Page Directory address for task 't' */
 page_table_entry * get_DIR (struct task_struct *t) 
@@ -92,7 +94,6 @@ void init_idle (void)
 	// initialize idle_task (task struct)
 	idle_task = ts;
 
-	// es un -> while(1); // nunca sale a user, solo sistema, hay que preparar para q se ejecute contexto de ejecucion, pila de sistema para q idle entre en cpu y qno permita ir a usuario. (Cima pila sistema haya un ebp que pueda recuperar y una dir de retorno a su codigo). Pila sistema no hay context HW SW, solo info minima ebp y @RET. Crear a mano pila <-. ((((Añadir task struct kernel_esp)))). EBP -> 0. @RET -> dir funcion codigo idle cpu_idle (en codigo del kernel). IDLE NUNCA EN LA COLA DE READY. Puntero global a su task union. 
 }
 
 void init_task1(void)
@@ -118,11 +119,10 @@ void init_task1(void)
 	// page dir -> cur page dir in sys
 	set_cr3(ts->dir_pages_baseAddr);
 	
-	// Codigo para crear el proceso a mano, primer proceso de user, tabla pàg proceso: Definir como es ((mm_addres.h)). setuserpages (crea primera tabla pags, llamarla). Prepararlo para indicar que es current(): cr3 -> tabla pag de este proceso. tss.esp0 -> pila sistema de task1 cima. msr 0x175-> pila sistema del proc actual. TASK1 NO SE ENCOLA EN READY QUEUE. 
+	// testing init taskswitch
+	init_task = ts;
 }
 
-// pila sistema del proc actual: current devuelve task struct pointer. (pila sist no definida en task struct). 
-// Task struct a task union -> cast indirecto. struct task struct pointer p -> (union task union *)p)->stack
 
 void init_sched()
 {
