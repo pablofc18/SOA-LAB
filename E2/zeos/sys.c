@@ -47,15 +47,53 @@ int sys_fork()
 	// get first elem
 	struct list_head *lh = list_first(&freequeue);
 	list_del(lh);	
+
 	// inherit the parent's task union
 	struct task_struct *ts = list_head_to_task_struct(lh);
 	union task_union *child = (union task_union*) ts;
 	copy_data(current(), child, sizeof(union task_union));
-	// get new page dir and ini dirpagAddr with allocate dir
+
+	// new pages dir por the child
 	allocate_DIR(&(child->task));	
-	// [+] allocate antes que get PT [+]
+
+	// allocate pages for data+stack if not enough ERROR
 	page_table_entry *childPagTab = get_PT(&(child->task));
-	//
+	int page;
+	for(page = 0; page < NUM_PAG_DATA; ++page) { // iterate w data
+		int child_ff = alloc_frame(); 
+		if (child_ff != -1) { // if this is true (!=-1) map page
+			set_ss_pag(childPagTab, PAG_LOG_INIT_DATA+page, child_ff);
+		}
+		else { // deallocate everything, no space
+			for(int i = 0; i < page; ++i) {
+				// free all the frames we allocated
+				free_frame(get_frame(childPagTab, PAG_LOG_INIT_DATA+i));
+				// remove the mapping we done allocated
+				del_ss_pag(childPagTab, PAG_LOG_INIT_DATA+i);
+			}				
+			// put the ts again on the free queue
+			list_add_tail(lh, &freequeue);
+			// return error 
+			return -¿;
+		}
+	}
+
+	// copy system pages from the parent
+	page_table_entry *parentPagTab = get_PT(current());
+	for(page = 0; page < NUM_PAG_KERNEL; ++page) {
+		// pages from 0 to NUM_PAG_KERNEL
+		set_ss_pag(childPagTab, page, get_frame(parentPagTab, page));
+	}
+	// copy code pages from parent
+	for(page = 0; page < NUM_PAG_CODE; ++page) {
+		// pages from PAG_LOG_INIT_CODE to PAG_LOG_INIT_CODE + NUM_PAGE_CODE
+		set_ss_pag(childPagTab, PAG_LOG_INIT_CODE+page, get_frame(parentPagTab, PAG_LOG_INIT_CODE+pag);
+	}
+	// copy data from parent, we need tmp logical page
+	
+	// flush tlb
+	set_cr3(get_DIR(current()));
+	
 	
   return PID;
 }
