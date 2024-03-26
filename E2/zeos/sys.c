@@ -74,7 +74,7 @@ int sys_fork()
 			// put the ts again on the free queue
 			list_add_tail(lh, &freequeue);
 			// return error 
-			return -¿;
+			return -1;
 		}
 	}
 
@@ -87,7 +87,7 @@ int sys_fork()
 	// copy code pages from parent
 	for(page = 0; page < NUM_PAG_CODE; ++page) {
 		// pages from PAG_LOG_INIT_CODE to PAG_LOG_INIT_CODE + NUM_PAGE_CODE
-		set_ss_pag(childPagTab, PAG_LOG_INIT_CODE+page, get_frame(parentPagTab, PAG_LOG_INIT_CODE+pag);
+		set_ss_pag(childPagTab, PAG_LOG_INIT_CODE+page, get_frame(parentPagTab, PAG_LOG_INIT_CODE+page));
 	}
 	// copy data from parent, we need tmp logical page
 	

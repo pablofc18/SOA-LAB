@@ -163,6 +163,7 @@ struct task_struct* current()
 }
 int get_quantum (struct task_struct *t)
 {
+  //printk("al get quantum tambe entro");
   return t->quantum;
 }
 
@@ -178,15 +179,23 @@ void update_sched_data_rr()
 
 int needs_sched_rr()
 {
-  if(quantum_ticks > 0) return 0;
-  if(list_empty(&readyqueue)){
-    quantum_ticks = get_quantum(current());
+  int quantum = quantum_ticks;
+  char * msg = " ";
+  itoa(msg,quantum);
+  printk(msg);
+  if(quantum_ticks > 0)
+  {
+    printk("quantum ha arribat a 0");
     return 0;
   }
+  /*if(list_empty(&readyqueue)){
+    quantum_ticks = get_quantum(current());
+    return 0;
+  }*/
   return 1;
 }
 
-update_process_state_rr(struct task_struct *t, struct list_ead *dst_queue)
+void update_process_state_rr(struct task_struct *t, struct list_head *dst_queue)
 {
   struct list_head * tmp = &t->list;
   if(!(tmp->prev == NULL && tmp->next == NULL))
@@ -201,7 +210,7 @@ void sched_next_rr(void)
   struct task_struct *next;
   if(!list_empty(&readyqueue))
   {
-    struct list_gead *lf = list_first(&readyqueue);
+    struct list_head *lf = list_first(&readyqueue);
     list_del(lf);
     next = list_head_to_task_struct(lf);
   }else{
@@ -210,13 +219,17 @@ void sched_next_rr(void)
   quantum_ticks = get_quantum(next);
   task_switch(next);
 }
+
+void schedule();
+
 void schedule(){
-  int pid = current()->PID;
+  /*int pid = current()->PID;
   char * msg;
   itoa(msg, pid);
-  printk(msg);
+  printk(msg);*/
   update_sched_data_rr();
   if(needs_sched_rr()){
+    printk("entro al if ");
     update_process_state_rr(current(), &readyqueue);
     sched_next_rr();
   }
