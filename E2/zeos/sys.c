@@ -100,7 +100,6 @@ int sys_fork()
 	// flush tlb
 	set_cr3(get_DIR(current()));
 	
-	
   return PID;
 }
 
