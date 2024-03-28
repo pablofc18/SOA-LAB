@@ -91,7 +91,7 @@ int sys_fork()
 	}
 	// copy data from parent, we need tmp logical page
 	for(page = NUM_PAG_KERNEL+NUM_PAG_CODE; page < NUM_PAG_KERNEL+NUM_PAG_CODE+NUM_PAG_DATA; ++page) {
-		set_ss_pag(parentPagTab, page+NUM_PAG_DATA, get_frame(childPagTab, page);
+		set_ss_pag(parentPagTab, page+NUM_PAG_DATA, get_frame(childPagTab, page));
 		// shift <<12 for 0x...000 and @ (void*) -> [ej en system.c (linia 98)]
 		copy_data((void *) (page<<12), (void *) ((page+NUM_PAG_DATA)<<12), PAGE_SIZE);
 		del_ss_pag(parentPagTab, page+NUM_PAG_DATA);	

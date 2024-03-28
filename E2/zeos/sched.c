@@ -179,19 +179,15 @@ void update_sched_data_rr()
 
 int needs_sched_rr()
 {
-  int quantum = quantum_ticks;
+  /*int quantum = quantum_ticks;
   char * msg = " ";
   itoa(msg,quantum);
-  printk(msg);
-  if(quantum_ticks > 0)
-  {
-    printk("quantum ha arribat a 0");
-    return 0;
-  }
-  /*if(list_empty(&readyqueue)){
+  printk(msg);*/
+  if(quantum_ticks > 0)  return 0;
+  if(list_empty(&readyqueue)){
     quantum_ticks = get_quantum(current());
     return 0;
-  }*/
+  }
   return 1;
 }
 
