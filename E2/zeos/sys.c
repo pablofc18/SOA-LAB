@@ -74,11 +74,7 @@ int sys_fork()
 			// put the ts again on the free queue
 			list_add_tail(lh, &freequeue);
 			// return error 
-<<<<<<< HEAD
-			return -1;
-=======
 			return -ENOMEM;
->>>>>>> c922f012377e252d3cb1abd964e02228d103e4d5
 		}
 	}
 
