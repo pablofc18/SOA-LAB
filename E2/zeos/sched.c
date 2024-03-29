@@ -33,7 +33,7 @@ int quantum_ticks;
 
 // DECLARAMOS idle_task
 struct task_struct *idle_task;
-// DECLARAMOS init_task
+// DECLARAMOS init_task (for testing)
 struct task_struct *init_task;
 
 /* get_DIR - Returns the Page Directory address for task 't' */
@@ -121,7 +121,7 @@ void init_task1(void)
 	// page dir -> cur page dir in sys
 	set_cr3(ts->dir_pages_baseAddr);
 	
-	// testing init taskswitch
+	// for testing init taskswitch
 	init_task = ts;
 }
 

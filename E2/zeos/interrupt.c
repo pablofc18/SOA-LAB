@@ -116,7 +116,6 @@ void keyboard_routine(void)
 	if (ch == '\0') ch = 'C';
     printc_xy(5,6,ch);
   }  
-	task_switch((union task_union*)init_task);
 }
 
 
