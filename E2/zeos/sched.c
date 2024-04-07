@@ -206,10 +206,12 @@ void sched_next_rr(void)
   struct task_struct *next;
   if(!list_empty(&readyqueue))
   {
+    printk("\n el seguent proces sera el primer de la llista ready");
     struct list_head *lf = list_first(&readyqueue);
     list_del(lf);
     next = list_head_to_task_struct(lf);
   }else{
+    printk("\n readyqueue esta buida, va idle doncs"); 
     next = idle_task;
   }
   quantum_ticks = get_quantum(next);
@@ -225,7 +227,7 @@ void schedule(){
   printk(msg);*/
   update_sched_data_rr();
   if(needs_sched_rr()){
-    printk("entro al if ");
+    //printk("entro al if ");
     update_process_state_rr(current(), &readyqueue);
     sched_next_rr();
   }
