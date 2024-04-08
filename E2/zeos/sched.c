@@ -107,6 +107,8 @@ void init_task1(void)
 	// pid = 1
 	ts->PID = 1;
 	ts->quantum = QUANTUM;
+  ts->state=ST_RUN;
+  quantum_ticks=ts->quantum;
 	// ini dir_pages_baseAddr	
 	allocate_DIR(ts);
 	// ini address spaces
@@ -210,9 +212,9 @@ void sched_next_rr(void)
   if(!list_empty(&readyqueue))
   {
     printk("\n el seguent proces sera el primer de la llista ready");
-    struct list_head *lf = list_first(&readyqueue);
-    list_del(lf);
-    next = list_head_to_task_struct(lf);
+    struct list_head *f = list_first(&readyqueue);
+    list_del(f);
+    next = list_head_to_task_struct(f);
   }else{
     printk("\n readyqueue esta buida, va idle doncs"); 
     next = idle_task;
