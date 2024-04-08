@@ -21,6 +21,7 @@ struct task_struct {
   struct list_head list;
   unsigned long kernel_esp;
   int quantum;
+  enum state_t state;
 };
 
 union task_union {

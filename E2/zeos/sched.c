@@ -161,6 +161,7 @@ struct task_struct* current()
   );
   return (struct task_struct*)(ret_value&0xfffff000);
 }
+
 int get_quantum (struct task_struct *t)
 {
   //printk("al get quantum tambe entro");
@@ -183,23 +184,25 @@ int needs_sched_rr()
   char * msg = " ";
   itoa(msg,quantum);
   printk(msg);*/
-  if(quantum_ticks > 0)  return 0;
-  if(list_empty(&readyqueue)){
-    quantum_ticks = get_quantum(current());
-    return 0;
-  }
   return 1;
+  if(quantum_ticks == 0 && !list_empty(&readyqueue)) return 1;
+  if(quantum_ticks == 0) quantum_ticks = get_quantum(current());
+  return 0;
 }
 
 void update_process_state_rr(struct task_struct *t, struct list_head *dst_queue)
 {
   struct list_head * tmp = &t->list;
-  if(!(tmp->prev == NULL && tmp->next == NULL))
+  if(t->state!=ST_RUN) list_del(tmp);
+  if(dst_queue!=NULL)
   {
-    list_del(tmp);
+   list_add_tail(tmp, dst_queue);
+   if(dst_queue!=&readyqueue) t->state=ST_BLOCKED;
+   else t->state=ST_READY;
   }
-  if(dst_queue) list_add_tail(tmp, dst_queue);
+  else t->state=ST_RUN;
 }
+
 
 void sched_next_rr(void)
 {
@@ -214,8 +217,9 @@ void sched_next_rr(void)
     printk("\n readyqueue esta buida, va idle doncs"); 
     next = idle_task;
   }
+  next->state=ST_RUN; 
   quantum_ticks = get_quantum(next);
-  task_switch(next);
+  task_switch((union task_union*)next);
 }
 
 void schedule();
