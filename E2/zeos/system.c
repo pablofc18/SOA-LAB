@@ -110,5 +110,3 @@ int __attribute__((__section__(".text.main")))
   /* The execution never arrives to this point */
   return 0;
 }
-
-

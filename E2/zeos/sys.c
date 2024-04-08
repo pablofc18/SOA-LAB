@@ -104,7 +104,17 @@ int sys_fork()
 }
 
 void sys_exit()
-{  
+{
+  struct task_struct *t = current();
+  page_table_entry *t_PT = get_PT(t);
+  for(int i = 0; i<NUM_PAG_DATA; ++i){
+    free_frame(get_frame(t_PT,i+PAG_LOG_INIT_DATA));
+    del_ss_pag(t_PT,i+PAG_LOG_INIT_DATA);
+  }
+  t->PID = -1;
+  t->dir_pages_baseAddr = NULL;
+  update_process_state_rr(t, &freequeue);
+  sched_next_rr();
 }
 
 #define TAMBUFF 512

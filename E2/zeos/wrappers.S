@@ -149,4 +149,26 @@ f_no_err:
 	pop %ebp
 	ret
 
+ENTRY(exit)
+  pushl %ebp
+  mov %esp,%ebp
 
+  movl $1,%eax
+
+  pushl %edx
+  pushl %ecx
+
+  push $exit_ret
+
+  pushl %ebp
+  movl %esp,%ebp
+
+  sysenter
+
+exit_ret:
+  popl %ebp
+  addl $4, %esp
+  popl %edx
+  popl %ecx
+  popl %ebp
+  ret
