@@ -17,7 +17,12 @@
 
 #define LECTURA 0
 #define ESCRIPTURA 1
+
+// Start from 1001 the first one (in fork)
+int global_pids = 1000;
+
 int zeos_ticks = 0;
+
 int check_fd(int fd, int permissions)
 {
   if (fd!=1) return -9; /*EBADF*/
@@ -35,13 +40,12 @@ int sys_getpid()
 	return current()->PID;
 }
 
-extern struct list_head freequeue;
+extern struct list_head freequeue, readyqueue;
+
+int ret_from_fork() { return 0; }
 
 int sys_fork()
 {
-  int PID=-1;
-  // creates the child process
-  
 	// check free free queue if no space error ENOMEM
 	if (list_empty(&freequeue)) return -ENOMEM;	
 	// get first elem
@@ -100,7 +104,23 @@ int sys_fork()
 	// flush tlb
 	set_cr3(get_DIR(current()));
 	
-  return PID;
+	// assign new PID
+  child->task.PID = ++global_pids;
+
+	// change regs for the ret of the proc
+	// sw and hw context already saved in stack
+	// @RET KERNEL_STACK_SIZE - 18 
+	// ebp KERNEL_STACK_SIZE - 19 
+	child->stack[KERNEL_STACK_SIZE-18] = (unsigned long) &ret_from_fork;
+	child->stack[KERNEL_STACK_SIZE-19] = 0;
+	// kernel_esp also needs to be modified
+	child->task.kernel_esp = (unsigned long) &(child->stack[KERNEL_STACK_SIZE-19]);
+
+	// child in ready queue 
+	child->task.state = ST_READY;
+	list_add_tail(&(child->task.list), &readyqueue);
+
+  return child->task.PID;
 }
 
 void sys_exit()
