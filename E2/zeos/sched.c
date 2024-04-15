@@ -164,6 +164,29 @@ struct task_struct* current()
   return (struct task_struct*)(ret_value&0xfffff000);
 }
 
+
+
+
+int unblock(int pid){
+  //check if pid process is child of current process 
+  if(pid == child && blocked){
+    //put to the ready queue
+    //withdraw from blocked queue  
+    return 0;
+  }else if(not blocked){
+    //increase the number of pending unblock operations 
+    return 0;
+  }
+  return -1;
+}
+
+void block(void){
+  if(/*there is no pending unblock*/){
+    //put the current process to the blocked queue FIFO order
+    // call schedule(); 
+  }
+}
+
 int get_quantum (struct task_struct *t)
 {
   //printk("al get quantum tambe entro");
@@ -238,3 +261,4 @@ void schedule(){
     sched_next_rr();
   }
 }
+

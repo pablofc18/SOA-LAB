@@ -22,6 +22,7 @@ struct task_struct {
   unsigned long kernel_esp;
   int quantum;
   enum state_t state;
+  int pending_unblocks;
 };
 
 union task_union {
