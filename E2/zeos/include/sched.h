@@ -23,6 +23,7 @@ struct task_struct {
   int quantum;
   enum state_t state;
   int pending_unblocks;
+  struct list_head sons; 
 };
 
 union task_union {

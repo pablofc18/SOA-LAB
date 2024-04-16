@@ -165,25 +165,51 @@ struct task_struct* current()
 }
 
 
+int is_child(int pid){
+  struct list_head * tmp = &current()->sons;  
+  while(!tmp) return 0;
+  while(tmp) {
+    if(tmp->PID == pid) return 1;
+    tmp = tmp->anchor;
+  }
+  return 0;
+}
 
-
+int is_blocked(int pid){
+  struct list_head * tmp = &current()->sons;  
+  while(!tmp) return 0;
+  while(tmp) {
+    if(tmp->PID == pid) return 1;
+    tmp = tmp->anchor;
+  }
+  return 0;
+}
 int unblock(int pid){
   //check if pid process is child of current process 
-  if(pid == child && blocked){
+  if(is_child(pid,current())){
     //put to the ready queue
-    //withdraw from blocked queue  
-    return 0;
-  }else if(not blocked){
-    //increase the number of pending unblock operations 
+    //withdraw from blocked queue 
+    //aqui podré recuperar el task_struct fill 
+    if(is_blocked(pid)){
+      struct list_head * tmp = get_list(pid);
+      list_add_tail(tmp, &readyqueue);
+    }else{
+      current()->pending_unblocks++;
+    }
     return 0;
   }
   return -1;
 }
 
 void block(void){
-  if(/*there is no pending unblock*/){
+  if(current()->pending_unblocks == 0){
     //put the current process to the blocked queue FIFO order
     // call schedule(); 
+    struc list_head * tmps = &current()->list;
+    list_add_tail(tmp,&blocked);
+    schedule();
+  }else{
+    current()->pending_unblocks--;
   }
 }
 
