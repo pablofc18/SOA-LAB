@@ -167,7 +167,7 @@ struct task_struct* current()
 
 int is_child(int pid){
   struct list_head * tmp = &current()->sons;  
-  while(!tmp) return 0;
+  if(!tmp) return 0;
   while(tmp) {
     if(tmp->PID == pid) return 1;
     tmp = tmp->anchor;
@@ -175,24 +175,29 @@ int is_child(int pid){
   return 0;
 }
 
-int is_blocked(int pid){
-  struct list_head * tmp = &current()->sons;  
-  while(!tmp) return 0;
-  while(tmp) {
-    if(tmp->PID == pid) return 1;
-    tmp = tmp->anchor;
-  }
+int is_blocked(struct task_struct *t){
+  if(t->state ==ST_BLOCKED) return 1;   
   return 0;
 }
+struct task_struct get_child(int pid){
+   struct list_head * tmp = &current()->sons;  
+  if(!tmp) return 0;
+  while(tmp) {
+    if(tmp->PID == pid) return tmp;
+    tmp = tmp->anchor;
+  }
+  return null;
+} 
+
 int unblock(int pid){
   //check if pid process is child of current process 
   if(is_child(pid,current())){
     //put to the ready queue
     //withdraw from blocked queue 
     //aqui podré recuperar el task_struct fill 
-    if(is_blocked(pid)){
-      struct list_head * tmp = get_list(pid);
-      list_add_tail(tmp, &readyqueue);
+    struct task_struct * t = get_child(pid);
+    if(is_blocked(t)){
+      list_add_tail(t, &readyqueue);
     }else{
       current()->pending_unblocks++;
     }
