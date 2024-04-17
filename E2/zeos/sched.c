@@ -196,7 +196,8 @@ struct list_head * get_child(int pid){
 int unblock(int pid){
   if(is_child(pid)){
     struct list_head *t = get_child(pid);
-    if(is_blocked(t)){
+    if(t == NULL) return -1;
+    if(is_blocked(list_head_to_task_struct(t))){
       update_process_state_rr(current(),&readyqueue); 
     }else{
       current()->pending_unblocks++;
@@ -208,7 +209,6 @@ int unblock(int pid){
 
 void block(void){
   if(current()->pending_unblocks == 0){
-    struct list_head * tmp = &current()->list;
     update_process_state_rr(current(),&blocked); 
     schedule();
   }else{
