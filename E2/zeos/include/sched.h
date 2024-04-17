@@ -24,6 +24,8 @@ struct task_struct {
   enum state_t state;
   int pending_unblocks;
   struct list_head sons; 
+  struct list_head brothers; 
+	struct task_struct * parent;
 };
 
 union task_union {

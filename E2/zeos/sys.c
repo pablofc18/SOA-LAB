@@ -120,6 +120,11 @@ int sys_fork()
 	child->task.state = ST_READY;
 	list_add_tail(&(child->task.list), &readyqueue);
 
+	// add to sons list (children list of each process)
+	list_add_tail(&(child->task.brothers), &(current()->sons));
+	// and initialize pointer to its father
+	child->task.parent = current();
+
   return child->task.PID;
 }
 
