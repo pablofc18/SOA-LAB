@@ -120,6 +120,8 @@ int sys_fork()
 	child->task.state = ST_READY;
 	list_add_tail(&(child->task.list), &readyqueue);
 
+  // ini list children of child
+  INIT_LIST_HEAD(&(child->task.sons));
 	// add to sons list (children list of each process)
 	list_add_tail(&(child->task.brothers), &(current()->sons));
 	// and initialize pointer to its father

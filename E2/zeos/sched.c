@@ -121,6 +121,10 @@ void init_task1(void)
 	// page dir -> cur page dir in sys
 	set_cr3(ts->dir_pages_baseAddr);
 	
+  // ini list head sons/brothers
+  INIT_LIST_HEAD(&(ts->sons));
+  INIT_LIST_HEAD(&(ts->brothers));
+
 	// for testing init taskswitch
 	init_task = ts;
 }
