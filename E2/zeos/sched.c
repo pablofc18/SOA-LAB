@@ -16,6 +16,7 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
 }
 #endif
 
+
 struct task_struct *list_head_to_task_struct(struct list_head *l)
 {
   unsigned long addr = (unsigned long) l;
@@ -172,7 +173,7 @@ struct task_struct* current()
 int is_child(int pid){
   struct list_head * tmp;
   struct list_head * t;
-  list_for_each_safe(tmp,t,&current()->sons)
+  list_for_each_safe(tmp,t,&(current()->sons))
     if((list_head_to_task_struct(tmp))->PID == pid) return 1; 
   return 0;
 }
@@ -187,7 +188,7 @@ int is_blocked(struct task_struct *t){
 struct list_head * get_child(int pid){
   struct list_head * tmp;
   struct list_head * t;
-  list_for_each_safe(tmp,t,&current()->sons){
+  list_for_each_safe(tmp,t,&(current()->sons)){
     if((list_head_to_task_struct(tmp))->PID == pid) return tmp;
   }
   return NULL;
@@ -271,7 +272,6 @@ void sched_next_rr(void)
   task_switch((union task_union*)next);
 }
 
-void schedule();
 
 void schedule(){
   update_sched_data_rr();

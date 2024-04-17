@@ -123,7 +123,7 @@ int sys_fork()
   // ini list children of child
   INIT_LIST_HEAD(&(child->task.sons));
 	// add to sons list (children list of each process)
-	list_add_tail(&(child->task.brothers), &(current()->sons));
+	list_add(&(child->task.brothers), &(current()->sons));
 	// and initialize pointer to its father
 	child->task.pParent = current();
 
