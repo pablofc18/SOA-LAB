@@ -170,12 +170,10 @@ struct task_struct* current()
 
 
 int is_child(int pid){
-  struct list_head * tmp = &current()->sons;  
-  if(!tmp) return 0;
-  while(tmp) {
-    if(tmp->PID == pid) return 1;
-    tmp = tmp->anchor;
-  }
+  struct list_head * tmp;
+  struct list_head * t;
+  list_for_each_safe(tmp,t,&current()->sons)
+    if((list_head_to_task_struct(tmp))->PID == pid) return 1; 
   return 0;
 }
 
@@ -183,25 +181,23 @@ int is_blocked(struct task_struct *t){
   if(t->state ==ST_BLOCKED) return 1;   
   return 0;
 }
-struct task_struct get_child(int pid){
-   struct list_head * tmp = &current()->sons;  
-  if(!tmp) return 0;
-  while(tmp) {
-    if(tmp->PID == pid) return tmp;
-    tmp = tmp->anchor;
+
+// si el fill de PID == pid existeix a la llista de sons retorna el task struct
+// aquest ha d'existir si o si  sino petarà i donarà error.
+struct list_head * get_child(int pid){
+  struct list_head * tmp;
+  struct list_head * t;
+  list_for_each_safe(tmp,t,&current()->sons){
+    if((list_head_to_task_struct(tmp))->PID == pid) return tmp;
   }
-  return null;
+  return NULL;
 } 
 
 int unblock(int pid){
-  //check if pid process is child of current process 
-  if(is_child(pid,current())){
-    //put to the ready queue
-    //withdraw from blocked queue 
-    //aqui podré recuperar el task_struct fill 
-    struct task_struct * t = get_child(pid);
+  if(is_child(pid)){
+    struct list_head *t = get_child(pid);
     if(is_blocked(t)){
-      list_add_tail(t, &readyqueue);
+      update_process_state_rr(current(),&readyqueue); 
     }else{
       current()->pending_unblocks++;
     }
@@ -212,10 +208,8 @@ int unblock(int pid){
 
 void block(void){
   if(current()->pending_unblocks == 0){
-    //put the current process to the blocked queue FIFO order
-    // call schedule(); 
-    struc list_head * tmps = &current()->list;
-    list_add_tail(tmp,&blocked);
+    struct list_head * tmp = &current()->list;
+    update_process_state_rr(current(),&blocked); 
     schedule();
   }else{
     current()->pending_unblocks--;
@@ -240,11 +234,6 @@ void update_sched_data_rr()
 
 int needs_sched_rr()
 {
-  /*int quantum = quantum_ticks;
-  char * msg = " ";
-  itoa(msg,quantum);
-  printk(msg);*/
-  return 1;
   if(quantum_ticks == 0 && !list_empty(&readyqueue)) return 1;
   if(quantum_ticks == 0) quantum_ticks = get_quantum(current());
   return 0;
@@ -285,13 +274,8 @@ void sched_next_rr(void)
 void schedule();
 
 void schedule(){
-  /*int pid = current()->PID;
-  char * msg;
-  itoa(msg, pid);
-  printk(msg);*/
   update_sched_data_rr();
   if(needs_sched_rr()){
-    //printk("entro al if ");
     update_process_state_rr(current(), &readyqueue);
     sched_next_rr();
   }
