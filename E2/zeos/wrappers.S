@@ -172,3 +172,60 @@ exit_ret:
   popl %ecx
   popl %ebp
   ret
+
+
+ENTRY(block)
+  pushl %ebp
+  mov %esp,%ebp
+
+  movl $5,%eax
+
+  pushl %edx
+  pushl %ecx
+
+  push $block_ret
+
+  pushl %ebp
+  movl %esp,%ebp
+
+  sysenter
+
+block_ret:
+  popl %ebp
+  addl $4, %esp
+  popl %edx
+  popl %ecx
+  popl %ebp
+  ret
+
+ENTRY(unblock)
+	pushl %ebp
+	mov %esp,%ebp
+	
+	pushl %edx
+	pushl %ecx
+	
+	movl $6, %eax
+	
+	pushl $unblock_ret
+	pushl %ebp
+	mov %esp,%ebp
+
+	sysenter
+
+unblock_ret:
+	popl %ebp
+	add $4, %esp
+	popl %ecx
+	popl %edx
+	cmpl $0, %eax
+	jge unblock_no_error
+	
+	movl %eax, errno
+	movl -1, %eax
+
+unblock_no_error:
+	popl %ebp
+	ret
+
+

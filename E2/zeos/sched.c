@@ -23,7 +23,7 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
   return (struct task_struct *) addr;	 
 }
 
-extern struct list_head blocked;
+//extern struct list_head blocked;
 
 // DECLARAMOS free y ready queue
 struct list_head freequeue;
@@ -166,54 +166,6 @@ struct task_struct* current()
 	: "=g" (ret_value)
   );
   return (struct task_struct*)(ret_value&0xfffff000);
-}
-
-
-int is_child(int pid){
-  struct list_head * tmp;
-  struct list_head * t;
-  list_for_each_safe(tmp,t,&current()->sons)
-    if((list_head_to_task_struct(tmp))->PID == pid) return 1; 
-  return 0;
-}
-
-int is_blocked(struct task_struct *t){
-  if(t->state ==ST_BLOCKED) return 1;   
-  return 0;
-}
-
-// si el fill de PID == pid existeix a la llista de sons retorna el task struct
-// aquest ha d'existir si o si  sino petarà i donarà error.
-struct list_head * get_child(int pid){
-  struct list_head * tmp;
-  struct list_head * t;
-  list_for_each_safe(tmp,t,&current()->sons){
-    if((list_head_to_task_struct(tmp))->PID == pid) return tmp;
-  }
-  return NULL;
-} 
-
-int unblock(int pid){
-  if(is_child(pid)){
-    struct list_head *t = get_child(pid);
-    if(t == NULL) return -1;
-    if(is_blocked(list_head_to_task_struct(t))){
-      update_process_state_rr(current(),&readyqueue); 
-    }else{
-      current()->pending_unblocks++;
-    }
-    return 0;
-  }
-  return -1;
-}
-
-void block(void){
-  if(current()->pending_unblocks == 0){
-    update_process_state_rr(current(),&blocked); 
-    schedule();
-  }else{
-    current()->pending_unblocks--;
-  }
 }
 
 int get_quantum (struct task_struct *t)

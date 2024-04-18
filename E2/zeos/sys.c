@@ -22,6 +22,7 @@
 int global_pids = 1000;
 
 int zeos_ticks = 0;
+extern struct list_head blocked;
 
 int check_fd(int fd, int permissions)
 {
@@ -140,9 +141,58 @@ void sys_exit()
   }
   t->PID = -1;
   t->dir_pages_baseAddr = NULL;
+  list_del(&t->list);
   update_process_state_rr(t, &freequeue);
   sched_next_rr();
 }
+
+int is_child(int pid){
+  struct list_head * tmp;
+  struct list_head * t;
+  list_for_each_safe(tmp,t,&current()->sons)
+    if((list_head_to_task_struct(tmp))->PID == pid) return 1; 
+  return 0;
+}
+
+int is_blocked(struct task_struct *t){
+  if(t->state ==ST_BLOCKED) return 1;   
+  return 0;
+}
+
+// si el fill de PID == pid existeix a la llista de sons retorna el task struct
+// aquest ha d'existir si o si  sino petarà i donarà error.
+struct list_head * get_child(int pid){
+  struct list_head * tmp;
+  struct list_head * t;
+  list_for_each_safe(tmp,t,&current()->sons){
+    if((list_head_to_task_struct(tmp))->PID == pid) return tmp;
+  }
+  return NULL;
+} 
+
+int sys_unblock(int pid){
+  if(is_child(pid)){
+    struct list_head *t = get_child(pid);
+    if(t == NULL) return -1;
+    if(is_blocked(list_head_to_task_struct(t))){
+      update_process_state_rr(current(),&readyqueue); 
+    }else{
+      current()->pending_unblocks++;
+    }
+    return 0;
+  }
+  return -1;
+}
+
+void sys_block(void){
+  if(current()->pending_unblocks == 0){
+    update_process_state_rr(current(),&blocked); 
+    schedule();
+  }else{
+    current()->pending_unblocks--;
+  }
+}
+
 
 #define TAMBUFF 512
 char buff[TAMBUFF];
