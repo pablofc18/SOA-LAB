@@ -14,6 +14,7 @@ int __attribute__ ((__section__(".text.main")))
   int pid = getpid();
  	itoa(pid,msg);
 	write(1,msg,strlen(msg));
+
   
   while(1) {
     /*char * msg = "";
