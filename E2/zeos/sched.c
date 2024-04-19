@@ -211,12 +211,10 @@ void sched_next_rr(void)
   struct task_struct *next;
   if(!list_empty(&readyqueue))
   {
-    printk("\n el seguent proces sera el primer de la llista ready");
     struct list_head *f = list_first(&readyqueue);
     list_del(f);
     next = list_head_to_task_struct(f);
   }else{
-    printk("\n readyqueue esta buida, va idle doncs"); 
     next = idle_task;
   }
   next->state=ST_RUN; 

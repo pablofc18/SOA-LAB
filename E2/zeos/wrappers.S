@@ -221,12 +221,15 @@ block_no_error:
 ENTRY(unblock)
 	pushl %ebp
 	mov %esp,%ebp
-	
+		
+	pushl %edx
+	mov 0x08(%ebp), %edx # pid
+
+	movl $6, %eax	
+
 	pushl %edx
 	pushl %ecx
-	
-	movl $6, %eax
-	
+
 	pushl $unblock_ret
 	pushl %ebp
 	mov %esp,%ebp
@@ -245,6 +248,7 @@ unblock_ret:
 	movl -1, %eax
 
 unblock_no_error:
+	popl %edx
 	popl %ebp
 	ret
 
