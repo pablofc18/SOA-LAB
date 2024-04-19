@@ -142,7 +142,7 @@ void sys_exit()
   t->PID = -1;
   t->dir_pages_baseAddr = NULL;
   list_del(&t->list);
-  update_process_state_rr(t, &freequeue);
+	list_add_tail(&(t->list), &freequeue);
   sched_next_rr();
 }
 

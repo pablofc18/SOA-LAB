@@ -54,6 +54,8 @@ write_no_error:
 	popl %ebp
 	ret	
 
+
+
 ENTRY(gettime)
 	pushl %ebp
 	mov %esp,%ebp
@@ -84,6 +86,8 @@ gt_no_error:
 	popl %ebp
 	ret
 
+
+
 ENTRY(getpid)
 	pushl %ebp
 	mov %esp,%ebp
@@ -113,6 +117,7 @@ gp_return:
 gp_no_error:
 	popl %ebp
 	ret
+
 
 
 ENTRY(fork)
@@ -149,6 +154,8 @@ f_no_err:
 	pop %ebp
 	ret
 
+
+
 ENTRY(exit)
   pushl %ebp
   mov %esp,%ebp
@@ -170,8 +177,14 @@ exit_ret:
   addl $4, %esp
   popl %edx
   popl %ecx
+	cmpl $0, %eax
+	jge exit_no_err
+	movl %eax, errno
+	mov $-1, %eax
+exit_no_err:
   popl %ebp
   ret
+
 
 
 ENTRY(block)
@@ -193,10 +206,17 @@ ENTRY(block)
 block_ret:
   popl %ebp
   addl $4, %esp
-  popl %edx
   popl %ecx
+  popl %edx
+	cmpl $0, %eax
+	jge block_no_error
+	movl %eax, errno
+	movl $-1, %eax
+block_no_error:
   popl %ebp
   ret
+
+
 
 ENTRY(unblock)
 	pushl %ebp
