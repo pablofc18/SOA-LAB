@@ -177,11 +177,6 @@ exit_ret:
   addl $4, %esp
   popl %edx
   popl %ecx
-	cmpl $0, %eax
-	jge exit_no_err
-	movl %eax, errno
-	mov $-1, %eax
-exit_no_err:
   popl %ebp
   ret
 
@@ -208,11 +203,6 @@ block_ret:
   addl $4, %esp
   popl %ecx
   popl %edx
-	cmpl $0, %eax
-	jge block_no_error
-	movl %eax, errno
-	movl $-1, %eax
-block_no_error:
   popl %ebp
   ret
 
