@@ -131,9 +131,22 @@ int sys_fork()
   return child->task.PID;
 }
 
+
+extern struct task_struct * idle_task;
+
 void sys_exit()
 {
   struct task_struct *t = current();
+	// remove curr proc from parents list and move any alive children from cur to idle
+	struct list_head * p;
+	struct list_head * p2;
+	list_for_each_safe(p,p2,&(t->pParent->sons))
+		if (list_head_to_task_struct(p)->PID == current()->PID) list_del(p);
+	list_for_each_safe(p,p2,&(current()->sons)) {
+		list_del(p);
+		list_add_tail(p, &(idle_task->sons));
+	}
+	
   page_table_entry *t_PT = get_PT(t);
   for(int i = 0; i<NUM_PAG_DATA; ++i){
     free_frame(get_frame(t_PT,i+PAG_LOG_INIT_DATA));
