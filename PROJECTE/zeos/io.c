@@ -24,6 +24,8 @@ Byte inb (unsigned short port)
   return v;
 }
 
+Word color_txt = 0x0200;
+
 void printc(char c)
 {
      __asm__ __volatile__ ( "movb %0, %%al; outb $0xe9" ::"a"(c)); /* Magic BOCHS debug: writes 'c' to port 0xe9 */
@@ -34,7 +36,7 @@ void printc(char c)
   }
   else
   {
-    Word ch = (Word) (c & 0x00FF) | 0x0200;
+    Word ch = (Word) (c & 0x00FF) | color_txt;
 	Word *screen = (Word *)0xb8000;
 	screen[(y * NUM_COLUMNS + x)] = ch;
     if (++x >= NUM_COLUMNS)

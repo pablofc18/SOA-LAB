@@ -236,3 +236,28 @@ int sys_get_stats(int pid, struct stats *st)
   }
   return -ESRCH; /*ESRCH */
 }
+
+extern Byte x;
+extern Byte y;
+
+int sys_gotoxy(int xn, int yn)
+{	
+	// num columns = 80 | num rows = 25
+	x = xn % 80;
+	y = yn % 25;
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+	return 0;
+}
+
+extern Word color_txt;
+
+int sys_set_color(int fg, int bg)
+{
+	Byte fgn = (Byte) (fg);
+	Byte bgn = (Byte) (bg);
+	color_txt = 0x0000;
+	color_txt = (fgn << 4) + bgn;
+	color_txt = color_txt << 8;
+	return 0;		
+}

@@ -100,3 +100,32 @@ ENTRY(get_stats)
 	popl %ebp
 	ret
 
+/* int gotoxy(int x, int y) */
+ENTRY(gotoxy)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $7, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // x
+	movl 0xC(%ebp), %ecx // y
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+	ret 
+
+/* int set_color(int fg, int bg) */
+ENTRY(set_color)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $8, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // fg
+	movl 0xC(%ebp), %ecx // bg
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+	ret 
