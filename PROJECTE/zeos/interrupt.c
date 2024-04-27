@@ -41,11 +41,20 @@ void clock_routine()
   schedule();
 }
 
+#define MAX_CHARS_BUFF 128
+char kbd_buffer_cyclic[MAX_CHARS_BUFF];
+// write index
+int kbd_buff_widx = 0;
+// read index
+int kbd_buff_ridx = 0;
+
 void keyboard_routine()
 {
   unsigned char c = inb(0x60);
-  
-  if (c&0x80) printc_xy(0, 0, char_map[c&0x7f]);
+	if (c&0x80) {
+		kbd_buffer_cyclic[kbd_buff_widx] = char_map[c&0x7f];
+		kbd_buff_widx = (kbd_buff_widx + 1) % MAX_CHARS_BUFF;
+	}
 }
 
 void setInterruptHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
