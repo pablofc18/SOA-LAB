@@ -263,9 +263,9 @@ int sys_set_color(int fg, int bg)
 }
  
 #define MAX_CHARS_BUFF 128
-extern char kbd_buffer_cyclic[MAX_CHARS_BUFF];
-extern int kbd_buff_widx;    
-extern int kbd_buff_ridx;    
+char kbd_buffer_cyclic[MAX_CHARS_BUFF];
+int kbd_buff_widx = 0;    
+int kbd_buff_ridx = 0;    
 
 extern int sys_read(char *b, int maxchars)
 {
