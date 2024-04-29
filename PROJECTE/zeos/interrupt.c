@@ -44,9 +44,9 @@ void clock_routine()
 #define MAX_CHARS_BUFF 128
 extern char kbd_buffer_cyclic[MAX_CHARS_BUFF];
 // write index
-extern int kbd_buff_widx = 0;
+extern int kbd_buff_widx;
 // read index
-extern int kbd_buff_ridx = 0;
+extern int kbd_buff_ridx;
 
 void keyboard_routine()
 {
