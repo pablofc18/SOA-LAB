@@ -129,3 +129,19 @@ ENTRY(set_color)
 	js nok // if error go to nok
 	popl %ebp
 	ret 
+
+// int read(char* b, int maxchars);
+ENTRY(read)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $5, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // b 
+	movl 0xC(%ebp), %ecx // masxchars 
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+  ret	
+
