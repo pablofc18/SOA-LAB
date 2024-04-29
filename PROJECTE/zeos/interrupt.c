@@ -42,7 +42,7 @@ void clock_routine()
 }
 
 #define MAX_CHARS_BUFF 128
-extern char kbd_buffer_cyclic[MAX_CHARS_BUFF];
+extern char kbd_buffer_cyclic[MAX_CHARS_BUFF]; 
 // write index
 extern int kbd_buff_widx;
 // read index
@@ -51,7 +51,7 @@ extern int kbd_buff_ridx;
 void keyboard_routine()
 {
   unsigned char c = inb(0x60);
-	if (c&0x80 && kbd_buff_ridx < kbd_buff_widx) {
+	if (c&0x80 && (kbd_buff_widx+1) % MAX_CHARS_BUFF != kbd_buff_ridx) {
 		kbd_buffer_cyclic[kbd_buff_widx] = char_map[c&0x7f];
 		kbd_buff_widx = (kbd_buff_widx + 1) % MAX_CHARS_BUFF;
 	}

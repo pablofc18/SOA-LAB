@@ -263,18 +263,18 @@ int sys_set_color(int fg, int bg)
 }
  
 #define MAX_CHARS_BUFF 128
-char kbd_buffer_cyclic[MAX_CHARS_BUFF];
+char kbd_buffer_cyclic[MAX_CHARS_BUFF]; 
 int kbd_buff_widx = 0;    
 int kbd_buff_ridx = 0;    
 
-extern int sys_read(char *b, int maxchars)
+int sys_read(char *b, int maxchars)
 {
   int i = 0;  
-  while(kbd_buff_ridx < kbd_buff_widx && i < maxchars){
+  while(i < maxchars && kbd_buffer_cyclic[kbd_buff_ridx] != NULL){
     b[i] = kbd_buffer_cyclic[kbd_buff_ridx];
+    kbd_buffer_cyclic[kbd_buff_ridx] == NULL;
     ++i;
-    if(kbd_buff_ridx == MAX_CHARS_BUFF-1) kbd_buff_ridx = 0;
-    else ++kbd_buff_ridx;
+		kbd_buff_ridx = (kbd_buff_ridx + 1) % MAX_CHARS_BUFF;
   }
   return i;
 }
