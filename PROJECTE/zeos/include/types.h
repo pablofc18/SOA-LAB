@@ -18,6 +18,17 @@ typedef unsigned long       DWord;
 #define highByte(address) (Byte)(((address) >> (16 + 8)) & 0xFF)
 #define high4Bits(limit) (Byte)(((limit) >> 16) & 0x0F)
 
+//// Definicio del buffer circular ////
+#define BUFFER_SIZE 64
+typedef struct {
+	char data[BUFFER_SIZE];
+	int head;
+	int tail;
+	int count;
+} CircularBuffer;
+
+//// //// //// //// //// //// //// ////
+
 typedef struct  /* Segment Descriptor */
 {
   Word  limit;

@@ -35,6 +35,17 @@ extern union task_union protected_tasks[NR_TASKS+2];
 extern union task_union *task; /* Vector de tasques */
 extern struct task_struct *idle_task;
 
+////////////////////////////////
+// FUNCIONS CIRCULAR BUFFER   //
+int circularBufferIsFull(CircularBuffer *buff);
+
+int circularBufferIsEmpty(CircularBuffer *buff);
+
+int circularBufferEnqueue(CircularBuffer *buff, char value);
+
+int circularBufferDequeue(CircularBuffer *buff, char *value);
+////////////////////////////////
+
 
 #define KERNEL_ESP(t)       	(DWord) &(t)->stack[KERNEL_STACK_SIZE]
 

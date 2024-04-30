@@ -27,6 +27,50 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
 }
 #endif
 
+
+
+////////////////////////////// 
+// FUNCIONS CIRCULAR BUFFER //
+void initialize_circularbuffer(CircularBuffer *buff)
+{
+	buff->head = 0;
+	buff->tail = 0;
+	buff->count = 0;
+}
+
+int circularBufferIsFull(CircularBuffer *buff)
+{
+	if (buff->count == BUFFER_SIZE) return 1;
+	else return 0;
+}
+
+int circularBufferIsEmpty(CircularBuffer *buff)
+{
+	if (buff->count == 0) return 1;
+	else return 0;
+}
+
+int circularBufferEnqueue(CircularBuffer *buff, char value)
+{
+	if (circularBufferIsFull(buff)) return 0;
+	buff->data[buff->tail] = value;
+	buff->tail = (buff->tail + 1) % BUFFER_SIZE;
+	buff->count++;
+	return 1;
+}
+
+int circularBufferDequeue(CircularBuffer *buff, char *value)
+{
+	if (circularBufferIsEmpty(buff)) return 0;
+	*value = buff->data[buff->head];
+	buff->head = (buff->head + 1) % BUFFER_SIZE;
+	buff->count--;
+	return 1;
+}
+////////////////////////////// 
+
+
+
 extern struct list_head blocked;
 
 // Free task structs
@@ -182,6 +226,10 @@ void init_idle (void)
 
 void setMSR(unsigned long msr_number, unsigned long high, unsigned long low);
 
+////////// INI circular buffer //////////
+CircularBuffer *kbd_circularBuffer;
+/////////////////////////////////////////
+
 void init_task1(void)
 {
   struct list_head *l = list_first(&freequeue);
@@ -207,6 +255,9 @@ void init_task1(void)
   setMSR(0x175, 0, (unsigned long)&(uc->stack[KERNEL_STACK_SIZE]));
 
   set_cr3(c->dir_pages_baseAddr);
+	
+	// initialize circular buffer
+	initialize_circularbuffer(kbd_circularBuffer);
 }
 
 void init_freequeue()
