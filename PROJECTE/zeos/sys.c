@@ -269,12 +269,10 @@ int kbd_buff_ridx = 0;
 
 int sys_read(char *b, int maxchars)
 {
-  int i = 0;  
-  while(i < maxchars && kbd_buffer_cyclic[kbd_buff_ridx] != NULL){
-    b[i] = kbd_buffer_cyclic[kbd_buff_ridx];
-    kbd_buffer_cyclic[kbd_buff_ridx] == NULL;
+  int i = 0; 
+  char a; 
+  while(i < maxchars && circularBufferDequeue(&kbd_buffer_cyclic,&a) && circularBufferEnqueue(&b, a)) {
     ++i;
-		kbd_buff_ridx = (kbd_buff_ridx + 1) % MAX_CHARS_BUFF;
   }
   return i;
 }
