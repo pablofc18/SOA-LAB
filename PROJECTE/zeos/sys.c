@@ -17,6 +17,8 @@
 
 #include <errno.h>
 
+#include <circular_buffer.h>
+
 #define LECTURA 0
 #define ESCRIPTURA 1
 
@@ -262,16 +264,17 @@ int sys_set_color(int fg, int bg)
 	return 0;		
 }
  
-#define MAX_CHARS_BUFF 128
-char kbd_buffer_cyclic[MAX_CHARS_BUFF]; 
-int kbd_buff_widx = 0;    
-int kbd_buff_ridx = 0;    
+extern CircularBuffer * kbd_circularBuffer;
 
 int sys_read(char *b, int maxchars)
 {
+	if (maxchars < 0 || maxchars >= BUFFER_SIZE) return -EINVAL;
+	if (!access_ok(VERIFY_WRITE, b, maxchars)) return -EFAULT;
+
   int i = 0; 
   char a; 
-  while(i < maxchars && circularBufferDequeue(&kbd_buffer_cyclic,&a) && circularBufferEnqueue(&b, a)) {
+  while(i < maxchars && circularBufferDequeue(kbd_circularBuffer,&a)) { 
+		b[i] = a;
     ++i;
   }
   return i;

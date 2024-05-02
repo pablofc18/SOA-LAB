@@ -14,5 +14,11 @@ int __attribute__ ((__section__(".text.main")))
 	int b = gotoxy(1,1);
 	char * msg = "hola que tal";
 	write(1, msg, strlen(msg)); */
-  while(1) { }
+
+	char * b = "";
+
+  while(1) { 
+		read(b, 4);
+		write(1,b,strlen(b));
+	}
 }

@@ -11,6 +11,8 @@
 
 #include <zeos_interrupt.h>
 
+#include <circular_buffer.h>
+
 Gate idt[IDT_ENTRIES];
 Register    idtR;
 
