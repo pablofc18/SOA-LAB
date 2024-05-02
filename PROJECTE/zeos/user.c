@@ -13,12 +13,16 @@ int __attribute__ ((__section__(".text.main")))
 /*	int a = set_color(2,4);
 	int b = gotoxy(1,1);
 	char * msg = "hola que tal";
-	write(1, msg, strlen(msg)); */
+	write(1, msg, strlen(msg)); 
 
 	char * b = "";
-
+	int v[20];
+	int i = 0;*/
   while(1) { 
-		read(b, 4);
+		/*if (i <20) v[i] = read(b, 4);
 		write(1,b,strlen(b));
+		++i;
+		if (i == 20) i = 0;	
+		if (v[19] != 0) continue; */
 	}
 }

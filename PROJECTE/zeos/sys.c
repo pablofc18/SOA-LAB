@@ -245,10 +245,11 @@ extern Byte y;
 int sys_gotoxy(int xn, int yn)
 {	
 	// num columns = 80 | num rows = 25
+	if (xn < 0 || yn < 0) return -EINVAL;
+	// si son positivos mas grandes de 80 o 25 el modulo lo arregla
+  // no haria falta comprobar eso (?)
 	x = xn % 80;
 	y = yn % 25;
-	if (x < 0) x = 0;
-	if (y < 0) y = 0;
 	return 0;
 }
 
@@ -256,6 +257,7 @@ extern Word color_txt;
 
 int sys_set_color(int fg, int bg)
 {
+	if (fg < 0 || fg > 15 || bg < 0 || bg > 15) return -EINVAL; 
 	Byte fgn = (Byte) (fg);
 	Byte bgn = (Byte) (bg);
 	color_txt = 0x0000;
@@ -264,7 +266,7 @@ int sys_set_color(int fg, int bg)
 	return 0;		
 }
  
-extern CircularBuffer * kbd_circularBuffer;
+extern CircularBuffer kbd_circularBuffer;
 
 int sys_read(char *b, int maxchars)
 {
@@ -273,8 +275,9 @@ int sys_read(char *b, int maxchars)
 
   int i = 0; 
   char a; 
-  while(i < maxchars && circularBufferDequeue(kbd_circularBuffer,&a)) { 
-		b[i] = a;
+  while(i < maxchars && circularBufferDequeue(&kbd_circularBuffer,&a)) { 
+		copy_to_user(&a,b,sizeof(a));
+		++b;
     ++i;
   }
   return i;

@@ -43,13 +43,14 @@ void clock_routine()
   schedule();
 }
 
-extern CircularBuffer *kbd_circularBuffer;
+CircularBuffer kbd_circularBuffer;
 
 void keyboard_routine()
 {
   unsigned char c = inb(0x60);
 	if (c&0x80) {
-		circularBufferEnqueue(kbd_circularBuffer, char_map[c&0x7F]);	
+		circularBufferEnqueue(&kbd_circularBuffer, char_map[c&0x7F]);	
+		if (circularBufferIsFull(&kbd_circularBuffer)) printk("EY");
 	}
 }
 

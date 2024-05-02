@@ -183,10 +183,6 @@ void init_idle (void)
 
 void setMSR(unsigned long msr_number, unsigned long high, unsigned long low);
 
-////////// INI circular buffer //////////
-CircularBuffer *kbd_circularBuffer;
-/////////////////////////////////////////
-
 void init_task1(void)
 {
   struct list_head *l = list_first(&freequeue);
@@ -212,9 +208,6 @@ void init_task1(void)
   setMSR(0x175, 0, (unsigned long)&(uc->stack[KERNEL_STACK_SIZE]));
 
   set_cr3(c->dir_pages_baseAddr);
-	
-	// initialize circular buffer
-	initialize_circularbuffer(kbd_circularBuffer);
 }
 
 void init_freequeue()
