@@ -18,11 +18,14 @@ int __attribute__ ((__section__(".text.main")))
 	char * b = "";
 	int v[20];
 	int i = 0;*/
+	char *b = "";
+	int x = read(b,10);
+	write(1,b,strlen(b));
+	char *c ="";
+	itoa(x,c);
+	gotoxy(0,0);
+	write(1,c,strlen(c));
   while(1) { 
-		/*if (i <20) v[i] = read(b, 4);
-		write(1,b,strlen(b));
-		++i;
-		if (i == 20) i = 0;	
-		if (v[19] != 0) continue; */
 	}
+		
 }

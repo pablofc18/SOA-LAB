@@ -99,7 +99,7 @@ int __attribute__((__section__(".text.main")))
 
 	// Initialize circular buffer
 	initialize_circularbuffer(&kbd_circularBuffer);
-
+	
   /* Move user code/data now (after the page table initialization) */
   copy_data((void *) KERNEL_START + *p_sys_size, usr_main, *p_usr_size);
 
