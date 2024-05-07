@@ -282,3 +282,67 @@ int sys_read(char *b, int maxchars)
   }
   return i;
 }
+
+//if addr correct and empty -> proceed
+//else if  addr not possible -> find empty region and proceed
+//else if addr NULL -> find empty region and proceed 
+// return error if addr is not page aligned
+void *sys_shmat(int id, void* addr){
+  if(id<0 || id > 9) return -EINVAL;
+  if(((unsigned long)addr & 0xfff) == 1) return -EINVAL;
+  unsigned long id_log;
+  page_table_entry * process_pt = get_PT(current());
+
+  if(!addr == NULL ) id_log = (unsigned long)addr>>12;
+  if(addr == NULL || process_pt[id_log].bits.present){
+    int trobat = 0; 
+    for(int i = PAG_LOG_INIT_DATA+(2*NUM_PAG_DATA); i < TOTAL_PAGES-1; ++i){
+      if(process_pt[i].bits.present == 0){
+        id_log = i;
+        trobat = 1;
+        break;
+      }
+    }
+    if(!trobat) return -EFAULT;
+    set_ss_pag(process_pt, id_log, shared_vector[id].id_frame);
+  }else{
+    set_ss_pag(process_pt, id_log, shared_vector[id].id_frame);
+  } 
+  ++shared_vector[id].ref;
+  void * result = (void *)(id_log<<12);
+  return result;
+}
+
+int sys_shmdt(void* addr){
+  if(addr == NULL) return -EINVAL; 
+  if(((unsigned long)addr & 0xfff) == 1) return -EINVAL;
+  if(access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
+  
+  unsigned long id_log = (unsigned long)addr>>12;
+  page_table_entry * process_pt = get_PT(current());
+
+  int i;
+  for(i = 0; i < 10; ++i){
+    if(get_frame(process_pt, id_log) == shared_vector[i].id_frame){
+      --shared_vector[i].ref;
+      break;
+    }
+  }
+
+  if(shared_vector[i].delete && shared_vector[i].ref == 0){
+    for(int j = 0; j < 4096; ++j) {
+      ((char*)addr)[j] = 0;
+    }
+  }
+
+  del_ss_pag(process_pt, id_log);
+  set_cr3(get_DIR(current()));
+
+  return 0;
+}
+
+int sys_shmrm(int id){
+  if(id> 9 || id < 0) return -EINVAL;
+  shared_vector[id].delete = 1;
+  return 0;
+}

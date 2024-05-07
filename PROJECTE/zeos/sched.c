@@ -27,6 +27,7 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
   return list_entry( l, struct task_struct, list);
 }
 #endif
+struct info shared_vector[10];
 
 extern struct list_head blocked;
 
@@ -228,6 +229,17 @@ void init_sched()
 {
   init_freequeue();
   INIT_LIST_HEAD(&readyqueue);
+}
+
+void initialize_sharedvector(){
+  for(int i = 0; i < 10; ++i){
+    int pf = alloc_frame();
+    if(pf > 0) {
+      shared_vector[i].id_frame = pf;
+      shared_vector[i].ref = 0;
+      shared_vector[i].delete = 0;
+    }
+  }
 }
 
 struct task_struct* current()

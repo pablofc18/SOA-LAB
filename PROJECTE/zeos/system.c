@@ -96,6 +96,8 @@ int __attribute__((__section__(".text.main")))
   init_idle();
   /* Initialize task 1 data */
   init_task1();
+  
+  initialize_sharedvector();
 
 	// Initialize circular buffer
 	initialize_circularbuffer(&kbd_circularBuffer);

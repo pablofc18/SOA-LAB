@@ -17,6 +17,14 @@
 
 enum state_t { ST_RUN, ST_READY, ST_BLOCKED };
 
+struct info{
+  int id_frame;
+  int ref;
+  int delete;
+};
+
+extern struct info shared_vector[10];
+
 struct task_struct {
   int PID;			/* Process ID. This MUST be the first field of the struct. */
   page_table_entry * dir_pages_baseAddr;
@@ -49,6 +57,8 @@ void init_task1(void);
 void init_idle(void);
 
 void init_sched(void);
+
+void initialize_vectorshared(void);
 
 void schedule(void);
 
