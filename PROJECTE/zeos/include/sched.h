@@ -23,8 +23,6 @@ struct info{
   int delete;
 };
 
-extern struct info shared_vector[10];
-
 struct task_struct {
   int PID;			/* Process ID. This MUST be the first field of the struct. */
   page_table_entry * dir_pages_baseAddr;

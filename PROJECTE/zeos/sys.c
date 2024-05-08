@@ -289,11 +289,11 @@ int sys_read(char *b, int maxchars)
 // return error if addr is not page aligned
 void *sys_shmat(int id, void* addr){
   if(id<0 || id > 9) return -EINVAL;
-  if(((unsigned long)addr & 0xfff) == 1) return -EINVAL;
-  unsigned long id_log;
+  if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;      
+  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
+  unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());
 
-  if(!addr == NULL ) id_log = (unsigned long)addr>>12;
   if(addr == NULL || process_pt[id_log].bits.present){
     int trobat = 0; 
     for(int i = PAG_LOG_INIT_DATA+(2*NUM_PAG_DATA); i < TOTAL_PAGES-1; ++i){
@@ -315,8 +315,8 @@ void *sys_shmat(int id, void* addr){
 
 int sys_shmdt(void* addr){
   if(addr == NULL) return -EINVAL; 
-  if(((unsigned long)addr & 0xfff) == 1) return -EINVAL;
-  if(access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
+  if(((unsigned long)addr & 0xfff) != 0) return -EINVAL;
+  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
   
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());

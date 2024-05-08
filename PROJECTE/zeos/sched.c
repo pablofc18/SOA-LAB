@@ -27,7 +27,7 @@ struct task_struct *list_head_to_task_struct(struct list_head *l)
   return list_entry( l, struct task_struct, list);
 }
 #endif
-struct info shared_vector[10];
+extern struct info shared_vector[10];
 
 extern struct list_head blocked;
 

@@ -16,6 +16,8 @@ Descriptor  *gdt = (Descriptor *) GDT_START;
 /* Register pointing to the memory segments table */
 Register    gdtR;
 
+/*shared memory vector */
+struct info shared_vector[10];
 /* PAGING */
 /* Variables containing the page directory and the page table */
   
