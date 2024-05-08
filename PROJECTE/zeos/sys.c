@@ -290,7 +290,7 @@ int sys_read(char *b, int maxchars)
 void *sys_shmat(int id, void* addr){
   if(id<0 || id > 9) return -EINVAL;
   if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;      
-  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
+  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EFAULT;
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());
 
@@ -315,8 +315,8 @@ void *sys_shmat(int id, void* addr){
 
 int sys_shmdt(void* addr){
   if(addr == NULL) return -EINVAL; 
-  if(((unsigned long)addr & 0xfff) != 0) return -EINVAL;
-  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EINVAL;
+  if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;
+  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EFAULT;
   
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());

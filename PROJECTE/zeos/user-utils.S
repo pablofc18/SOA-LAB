@@ -145,3 +145,44 @@ ENTRY(read)
 	popl %ebp
   ret	
 
+ENTRY(shmat)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $15, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // id  
+	movl 0xC(%ebp), %ecx // addr 
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+  ret	
+
+ENTRY(shmdt)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $16, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // addr 
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+  ret	
+
+ENTRY(shmrm)
+	pushl %ebp
+	movl %esp, %ebp
+	pushl %ebx // first parameter
+	movl $17, %eax // num syscalltable
+	movl 0x8(%ebp), %ebx // id 
+	call syscall_sysenter
+	popl %ebx // quitar param
+	test %eax, %eax
+	js nok // if error go to nok
+	popl %ebp
+  ret	
+
+
