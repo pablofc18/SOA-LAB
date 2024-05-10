@@ -117,3 +117,8 @@ sysenter_fin:
 	movl 12(%esp), %ecx	      // User stack address
 	sti
 	sysexit
+
+ENTRY(pf_handler)
+	mov %cr2, %eax
+	mov %eax, (%esp)
+	call pf_routine;

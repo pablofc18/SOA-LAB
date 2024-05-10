@@ -8,6 +8,7 @@
 #include <hardware.h>
 #include <sched.h>
 
+// phys_mem has the #refs 
 Byte phys_mem[TOTAL_PAGES];
 
 /* SEGMENTATION */
@@ -244,7 +245,7 @@ void free_user_pages( struct task_struct *task )
 void free_frame( unsigned int frame )
 {
     if ((frame>NUM_PAG_KERNEL)&&(frame<TOTAL_PAGES))
-      phys_mem[frame]=FREE_FRAME;
+      if (phys_mem[frame] > 0) phys_mem[frame]--;
 }
 
 /* set_ss_pag - Associates logical page 'page' with physical page 'frame' */

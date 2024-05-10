@@ -101,6 +101,7 @@ void setTrapHandler(int vector, void (*handler)(), int maxAccessibleFromPL)
 void clock_handler();
 void keyboard_handler();
 void system_call_handler();
+void pf_handler();
 
 void setMSR(unsigned long msr_number, unsigned long high, unsigned long low);
 
@@ -122,9 +123,20 @@ void setIdt()
   /* ADD INITIALIZATION CODE FOR INTERRUPT VECTOR */
   setInterruptHandler(32, clock_handler, 0);
   setInterruptHandler(33, keyboard_handler, 0);
+	// ADD FOR PAGE FAULT
+	setInterruptHandler(14, pf_handler, 0);
 
   setSysenter();
 
   set_idt_reg(&idtR);
 }
 
+void pf_routine(unsigned long cr2, unsigned long eip)
+{
+//	unsigned long fault_address;
+  //  __asm__ __volatile__("movl %%cr2, %0" : "=r" (fault_address));
+char*b="";
+itoa(cr2,b);
+printk(b);
+while(1);	
+}
