@@ -290,13 +290,13 @@ int sys_read(char *b, int maxchars)
 void *sys_shmat(int id, void* addr){
   if(id<0 || id > 9) return -EINVAL;
   if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;      
-  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EFAULT;
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());
 
+  if(id_log>= 1024) return -EINVAL;
   if(addr == NULL || process_pt[id_log].bits.present){
     int trobat = 0; 
-    for(int i = PAG_LOG_INIT_DATA+(2*NUM_PAG_DATA); i < TOTAL_PAGES-1; ++i){
+    for(int i = id_log; i < TOTAL_PAGES-1; ++i){
       if(process_pt[i].bits.present == 0){
         id_log = i;
         trobat = 1;
@@ -316,7 +316,6 @@ void *sys_shmat(int id, void* addr){
 int sys_shmdt(void* addr){
   if(addr == NULL) return -EINVAL; 
   if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;
-  if(!access_ok(VERIFY_WRITE, addr, 4096)) return -EFAULT;
   
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());
