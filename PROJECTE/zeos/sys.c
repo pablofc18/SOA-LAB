@@ -318,6 +318,8 @@ int sys_shmdt(void* addr){
   if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;
   
   unsigned long id_log = (unsigned long)addr>>12;
+  if(id_log>= 1024) return -EINVAL;
+
   page_table_entry * process_pt = get_PT(current());
 
   int i;
