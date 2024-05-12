@@ -17,7 +17,7 @@ int __attribute__ ((__section__(".text.main")))
 
 	char * b = "";
 	int v[20];
-	int i = 0;*/
+	int i = 0;
 	char *b = "";
 	int x = read(b,10);
 	write(1,b,strlen(b));
@@ -26,7 +26,17 @@ int __attribute__ ((__section__(".text.main")))
 	gotoxy(0,0);
 	write(1,c,strlen(c));
 	char*p=0;
-	*p='x';
+	*p='x';*/
+
+	char *c = "CCCC";
+	if (fork() > 0) {
+		int x = 2;
+		if (x%2==0) write(1,c,strlen(c));
+	} else {
+		char *b = "HOLA";
+		write(1,b,strlen(b));
+	}
+
   while(1) { 
 	}
 		

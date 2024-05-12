@@ -121,4 +121,5 @@ sysenter_fin:
 ENTRY(pf_handler)
 	mov %cr2, %eax
 	mov %eax, (%esp)
-	call pf_routine;
+	call pf_routine
+	iret

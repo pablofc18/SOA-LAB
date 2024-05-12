@@ -131,12 +131,37 @@ void setIdt()
   set_idt_reg(&idtR);
 }
 
+
+int is_cow_pf(unsigned long cr2) {
+	unsigned long x = cr2>>12;	
+	page_table_entry * pt = get_DIR(current());
+	if (pt[x].bits.rw == 0) return 1;
+	return 1;
+}
+
+extern Byte phys_mem[TOTAL_PAGES];
+
+void handle_pf_cow(unsigned long cr2) {
+	page_table_entry * pt = get_DIR(current());
+	unsigned int addr = pt[cr2>>12].bits.pbase_addr;
+	if (phys_mem[addr] > 1) {
+		int nw_phf = alloc_frame();	
+		set_ss_pag(pt,cr2>>12,nw_phf);
+	}
+	// change bit rw
+	else {
+		page_table_entry * pt = get_DIR(current());
+		pt[cr2>>12].bits.rw = 1;
+	}
+}
+
 void pf_routine(unsigned long cr2, unsigned long eip)
 {
-//	unsigned long fault_address;
-  //  __asm__ __volatile__("movl %%cr2, %0" : "=r" (fault_address));
-char*b="";
-itoa(cr2,b);
-printk(b);
-while(1);	
+	if (is_cow_pf(cr2)) {
+		handle_pf_cow(cr2);
+	}
+	else {
+		printk("Page fault EXCEPTION!!");
+		while(1);
+	}
 }
