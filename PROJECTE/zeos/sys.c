@@ -122,6 +122,15 @@ int sys_fork(void)
     copy_data((void*)(pag<<12), (void*)((pag+NUM_PAG_DATA)<<12), PAGE_SIZE);
     del_ss_pag(parent_PT, pag+NUM_PAG_DATA);
   }
+
+	// Copy shared memory if available
+	for (pag=NUM_PAG_KERNEL+NUM_PAG_CODE+NUM_PAG_DATA; pag<TOTAL_PAGES; pag++)
+	{
+		if (parent_PT[pag].bits.present) {
+			set_ss_pag(process_PT, pag, get_frame(parent_PT, pag));
+		}
+	}
+
   /* Deny access to the child's memory space */
   set_cr3(get_DIR(current()));
 
@@ -201,6 +210,14 @@ void sys_exit()
     free_frame(get_frame(process_PT, PAG_LOG_INIT_DATA+i));
     del_ss_pag(process_PT, PAG_LOG_INIT_DATA+i);
   }
+	// deallocate if shared memory
+	for (i = PAG_LOG_INIT_DATA+NUM_PAG_DATA; i < TOTAL_PAGES; i++)
+	{
+		if (process_PT[i].bits.present) {
+			free_frame(get_frame(process_PT, i));
+			del_ss_pag(process_PT, i);
+		}
+	}
   
   /* Free task_struct */
   list_add_tail(&(current()->list), &freequeue);
