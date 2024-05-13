@@ -66,6 +66,7 @@ int access_ok(int type, const void * addr, unsigned long size)
 {
   unsigned long addr_ini, addr_fin;
 
+  page_table_entry *process_PT = get_PT(current());
   addr_ini=(((unsigned long)addr)>>12);
   addr_fin=((((unsigned long)addr)+size)>>12);
   if (addr_fin < addr_ini) return 0; //This looks like an overflow ... deny access
@@ -78,9 +79,11 @@ int access_ok(int type, const void * addr, unsigned long size)
           (addr_fin<=USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))
 	  return 1;
     default:
-      if ((addr_ini>=USER_FIRST_PAGE)&&
-  	(addr_fin<=(USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)))
-          return 1;
+      if ((addr_ini>=USER_FIRST_PAGE)&&(addr_fin<=(USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))) return 1;
+
+  }
+  for(int i = addr_ini; i < addr_fin; ++i){
+   if(process_PT[i].bits.present) return 1;
   }
   return 0;
 }
