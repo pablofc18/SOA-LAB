@@ -76,14 +76,24 @@ int access_ok(int type, const void * addr, unsigned long size)
     case VERIFY_WRITE:
       /* Should suppose no support for automodifyable code */
       if ((addr_ini>=USER_FIRST_PAGE+NUM_PAG_CODE)&&
-          (addr_fin<=USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))
-	  return 1;
+          (addr_fin<=USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)) return 1;
+			else if ((addr_ini >= USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)&&(addr_fin <= TOTAL_PAGES)) {
+					for (int i = addr_ini; i <= addr_fin; i++) {
+							unsigned int fr = get_frame(current(), i);
+							if (fr == 0) return 0;
+					}
+					return 1;
+			}
     default:
       if ((addr_ini>=USER_FIRST_PAGE)&&(addr_fin<=(USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))) return 1;
+			else if ((addr_ini >= USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)&&(addr_fin <= TOTAL_PAGES)) {
+					for (int i = addr_ini; i <= addr_fin; i++) {
+							unsigned int fr = get_frame(current(), i);
+							if (fr == 0) return 0;
+					}
+					return 1;
+			}
 
-  }
-  for(int i = addr_ini; i < addr_fin; ++i){
-   if(process_PT[i].bits.present) return 1;
   }
   return 0;
 }
