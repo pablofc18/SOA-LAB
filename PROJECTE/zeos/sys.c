@@ -58,6 +58,13 @@ int ret_from_fork()
   return 0;
 }
 
+int find_shframe(int fr) {
+	for (int i = 0; i < 10; ++i) {
+		if (shared_vector[i].id_frame == fr) return i;
+	}
+	return -1;
+}
+
 int sys_fork(void)
 {
   struct list_head *lhcurrent = NULL;
@@ -126,9 +133,12 @@ int sys_fork(void)
 	// Copy shared memory if available
 	for (pag=NUM_PAG_KERNEL+NUM_PAG_CODE+NUM_PAG_DATA; pag<TOTAL_PAGES; pag++)
 	{
-		if (parent_PT[pag].bits.present) {
-			set_ss_pag(process_PT, pag, get_frame(parent_PT, pag));
-		}
+		int fr = get_frame(parent_PT, pag);
+		if (fr != 0) {
+			int idx_fr = find_shframe(fr);
+			shared_vector[idx_fr].ref++;
+			set_ss_pag(process_PT, pag, fr);
+		}	
 	}
 
   /* Deny access to the child's memory space */
@@ -213,10 +223,17 @@ void sys_exit()
 	// deallocate if shared memory
 	for (i = PAG_LOG_INIT_DATA+NUM_PAG_DATA; i < TOTAL_PAGES; i++)
 	{
-		if (process_PT[i].bits.present) {
-			free_frame(get_frame(process_PT, i));
+		int fr = get_frame(process_PT, i);
+		if (fr != 0) {
+			int idx_fr = find_shframe(fr);
+			shared_vector[idx_fr].ref--;
 			del_ss_pag(process_PT, i);
-		}
+			if (shared_vector[idx_fr].ref == 0 && shared_vector[idx_fr].delete) {
+				for (int k = 0; k < PAGE_SIZE; ++k) {
+					*((char*)(fr<<12)+k) = 0; // clear 
+				}
+			}
+		}	
 	}
   
   /* Free task_struct */
@@ -307,6 +324,7 @@ int sys_read(char *b, int maxchars)
 void *sys_shmat(int id, void* addr){
   if(id<0 || id > 9) return -EINVAL;
   if(((unsigned long)addr & 0xfff) != 0) return -EFAULT;      
+
   unsigned long id_log = (unsigned long)addr>>12;
   page_table_entry * process_pt = get_PT(current());
 
