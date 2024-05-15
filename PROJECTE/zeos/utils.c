@@ -66,6 +66,7 @@ int access_ok(int type, const void * addr, unsigned long size)
 {
   unsigned long addr_ini, addr_fin;
 
+  page_table_entry *process_PT = get_PT(current());
   addr_ini=(((unsigned long)addr)>>12);
   addr_fin=((((unsigned long)addr)+size)>>12);
   if (addr_fin < addr_ini) return 0; //This looks like an overflow ... deny access
@@ -75,12 +76,24 @@ int access_ok(int type, const void * addr, unsigned long size)
     case VERIFY_WRITE:
       /* Should suppose no support for automodifyable code */
       if ((addr_ini>=USER_FIRST_PAGE+NUM_PAG_CODE)&&
-          (addr_fin<=USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))
-	  return 1;
+          (addr_fin<=USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)) return 1;
+			else if ((addr_ini >= USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)&&(addr_fin <= TOTAL_PAGES)) {
+					for (int i = addr_ini; i <= addr_fin; i++) {
+							unsigned int fr = get_frame(current(), i);
+							if (fr == 0) return 0;
+					}
+					return 1;
+			}
     default:
-      if ((addr_ini>=USER_FIRST_PAGE)&&
-  	(addr_fin<=(USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)))
-          return 1;
+      if ((addr_ini>=USER_FIRST_PAGE)&&(addr_fin<=(USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA))) return 1;
+			else if ((addr_ini >= USER_FIRST_PAGE+NUM_PAG_CODE+NUM_PAG_DATA)&&(addr_fin <= TOTAL_PAGES)) {
+					for (int i = addr_ini; i <= addr_fin; i++) {
+							unsigned int fr = get_frame(current(), i);
+							if (fr == 0) return 0;
+					}
+					return 1;
+			}
+
   }
   return 0;
 }
