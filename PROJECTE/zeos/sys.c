@@ -23,6 +23,7 @@
 #define ESCRIPTURA 1
 
 void * get_ebp();
+void get_cr2();
 
 int check_fd(int fd, int permissions)
 {
@@ -80,8 +81,32 @@ int sys_fork(void)
   /* new pages dir */
   allocate_DIR((struct task_struct*)uchild);
   
-	int pag;
+	/* Allocate pages for DATA+STACK */
+  int new_ph_pag, pag, i;
   page_table_entry *process_PT = get_PT(&uchild->task);
+  for (pag=0; pag<NUM_PAG_DATA; pag++)
+  {
+    new_ph_pag=alloc_frame();
+    if (new_ph_pag!=-1) /* One page allocated */
+    {
+      set_ss_pag(process_PT, PAG_LOG_INIT_DATA+pag, new_ph_pag);
+    }
+    else /* No more free pages left. Deallocate everything */
+    {
+      /* Deallocate allocated pages. Up to pag. */
+      for (i=0; i<pag; i++)
+      {
+        free_frame(get_frame(process_PT, PAG_LOG_INIT_DATA+i));
+        del_ss_pag(process_PT, PAG_LOG_INIT_DATA+i);
+      }
+      /* Deallocate task_struct */
+      list_add_tail(lhcurrent, &freequeue);
+      
+      /* Return error */
+      return -EAGAIN; 
+    }
+  }	
+
   /* Copy parent's SYSTEM and CODE and DATA (readonly) to child. */
   page_table_entry *parent_PT = get_PT(current());
   for (pag=0; pag<NUM_PAG_KERNEL; pag++)
@@ -92,14 +117,13 @@ int sys_fork(void)
   {
     set_ss_pag(process_PT, PAG_LOG_INIT_CODE+pag, get_frame(parent_PT, PAG_LOG_INIT_CODE+pag));
   }
+	// data read only
 	for (pag=0; pag<NUM_PAG_DATA; pag++)
 	{
 		set_ss_pag(process_PT, PAG_LOG_INIT_DATA+pag, get_frame(parent_PT, PAG_LOG_INIT_DATA+pag));
 		// set bit rw to only read (0) child and parent
 		process_PT[PAG_LOG_INIT_DATA+pag].bits.rw=0;
 		parent_PT[PAG_LOG_INIT_DATA+pag].bits.rw=0;
-		// ++ refs in phys_mem
-		phys_mem[get_frame(parent_PT, PAG_LOG_INIT_DATA+pag)]++;
 	}
 
   /* Deny access to the child's memory space */

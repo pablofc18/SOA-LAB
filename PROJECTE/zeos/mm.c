@@ -245,7 +245,7 @@ void free_user_pages( struct task_struct *task )
 void free_frame( unsigned int frame )
 {
     if ((frame>NUM_PAG_KERNEL)&&(frame<TOTAL_PAGES))
-      if (phys_mem[frame] > 0) phys_mem[frame]--;
+    	phys_mem[frame]=FREE_FRAME;
 }
 
 /* set_ss_pag - Associates logical page 'page' with physical page 'frame' */
@@ -257,11 +257,14 @@ void set_ss_pag(page_table_entry *PT, unsigned page,unsigned frame)
 	PT[page].bits.rw=1;
 	PT[page].bits.present=1;
 
+	phys_mem[frame]++;
 }
 
 /* del_ss_pag - Removes mapping from logical page 'logical_page' */
 void del_ss_pag(page_table_entry *PT, unsigned logical_page)
 {
+	int frame = PT[logical_page].bits.pbase_addr;
+	phys_mem[frame]--;
   PT[logical_page].entry=0;
 }
 

@@ -28,16 +28,20 @@ int __attribute__ ((__section__(".text.main")))
 	char*p=0;
 	*p='x';*/
 
-	char *c = "CCCC";
+/*	char *c = "CCCC";
 	if (fork() > 0) {
 		int x = 2;
 		if (x%2==0) write(1,c,strlen(c));
+		exit();
 	} else {
 		char *b = "HOLA";
 		write(1,b,strlen(b));
 	}
-
+*/
   while(1) { 
-	}
-		
+/*	pid = getpid();
+	char *b = "";
+	itoa(pid,b);
+	write(1,b,strlen(b));		
+*/	}
 }

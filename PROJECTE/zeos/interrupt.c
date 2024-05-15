@@ -132,33 +132,46 @@ void setIdt()
 }
 
 
-int is_cow_pf(unsigned long cr2) {
-	unsigned long x = cr2>>12;	
-	page_table_entry * pt = get_DIR(current());
-	if (pt[x].bits.rw == 0) return 1;
-	return 1;
-}
-
 extern Byte phys_mem[TOTAL_PAGES];
 
-void handle_pf_cow(unsigned long cr2) {
-	page_table_entry * pt = get_DIR(current());
-	unsigned int addr = pt[cr2>>12].bits.pbase_addr;
-	if (phys_mem[addr] > 1) {
+int is_cow_pf(unsigned long log_pg) {
+	page_table_entry * pt = get_PT(current());
+	if (pt[log_pg].bits.rw == 0) return 1;
+	return 0;
+}
+
+void handle_pf_cow(unsigned long log_pg) {
+	page_table_entry * pt = get_PT(current());
+	unsigned long phys_addr = get_frame(pt, log_pg);
+	if (phys_mem[phys_addr] > 1) {
 		int nw_phf = alloc_frame();	
-		set_ss_pag(pt,cr2>>12,nw_phf);
+		int pag = PAG_LOG_INIT_DATA + NUM_PAG_DATA;
+		// search empty space
+		while (pag < TOTAL_PAGES && pt[pag].bits.present == 1) pag++;
+		// map new frame in new page
+		set_ss_pag(pt, pag, nw_phf);
+		// copy data in that new frame
+		copy_data((void*)(log_pg<<12),(void*)(pag<<12), PAGE_SIZE);
+		// delete previous mapping on data
+		del_ss_pag(pt, log_pg);
+		// map new phys frame on data	
+		set_ss_pag(pt,log_pg,nw_phf);
+		// delete previos map to pag
+		del_ss_pag(pt, pag);
+		// flush tlb
+		set_cr3(get_DIR(current()));
 	}
 	// change bit rw
-	else {
-		page_table_entry * pt = get_DIR(current());
-		pt[cr2>>12].bits.rw = 1;
+	else if (phys_mem[phys_addr] == 1) {
+		pt[log_pg].bits.rw = 1;
 	}
 }
 
-void pf_routine(unsigned long cr2, unsigned long eip)
+void pf_routine(unsigned long param, unsigned long eip)
 {
-	if (is_cow_pf(cr2)) {
-		handle_pf_cow(cr2);
+	unsigned long log_pg = (unsigned long) get_cr2() >> 12;
+	if (is_cow_pf(log_pg)) {
+		handle_pf_cow(log_pg);
 	}
 	else {
 		printk("Page fault EXCEPTION!!");

@@ -119,7 +119,7 @@ sysenter_fin:
 	sysexit
 
 ENTRY(pf_handler)
-	mov %cr2, %eax
-	mov %eax, (%esp)
 	call pf_routine
+	// param
+	addl $4, %esp
 	iret

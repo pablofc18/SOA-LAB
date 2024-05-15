@@ -40,3 +40,7 @@ ENTRY(setMSR)
 	pop %ebp
 	ret
 
+/*function for COW (interrupt)*/
+ENTRY(get_cr2)
+	mov %cr2, %eax
+	ret
