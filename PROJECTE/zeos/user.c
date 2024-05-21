@@ -4,34 +4,36 @@ char buff[24];
 
 int pid;
 
+float lasttime=0.0f;
 int frames = 0;
-float calcular_fps(float tm) {
-	return (float) (1/(tm));
-}
+float fps = 0.0f;
 
-void mostrar_fps(float bef, float aft) {
+void mostrar_fps() {
 	gotoxy(50, 0);
 	set_color(2,0);
 	write(1,"fps: ",4);
-	
-	float a = bef/18.0;	
-	float b = aft/18.0;
 
-	float fps = calcular_fps(b-a);
+	float currenttime=gettime();	
+	gotoxy(30, 0);
+if (currenttime>0.00) write(1,"T",1);
+	itoa(currenttime,buff);
+	write(1,buff,strlen(buff));
+	float tickselapsed=currenttime-lasttime;
+	
+	float secselapsed=tickselapsed/18.0f;
+	if (secselapsed>=1.0) {
+	fps = (float) frames/secselapsed;
+	
+	frames = 0;
+	lasttime=currenttime;
+
 	itoa(fps,buff);
 	write(1,buff,strlen(buff));
+	}
 }
 
-
-int __attribute__ ((__section__(".text.main")))
-  main(void)
-{
-    /* Next line, tries to move value 0 to CR3 register. This register is a privileged one, and so it will raise an exception */
-     /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
-
-	float bef=0, aft=0;
-	bef=gettime();
-
+void show_map() {
+	frames++;
 	// pintar todo negro para borrar texto
 	for (int i = 0; i < 80; ++i) {
 		for (int j = 0; j < 25; ++j) {
@@ -52,6 +54,13 @@ int __attribute__ ((__section__(".text.main")))
 		{
 			if (i==0||i==rows-1||j==0||j==cols-1) {
 				char * b = "#";
+				set_color(1,0);
+				gotoxy(j,i);
+				write(1,b,strlen(b));
+			}
+			else {
+				char *b=".";
+				set_color(0,3);
 				gotoxy(j,i);
 				write(1,b,strlen(b));
 			}
@@ -79,17 +88,28 @@ int __attribute__ ((__section__(".text.main")))
 				gotoxy(j,11);
 				write(1,b,strlen(b));
   }
+	mostrar_fps();
+}
 
-	aft = gettime();
-	mostrar_fps(bef,aft);
-	
+
+int __attribute__ ((__section__(".text.main")))
+  main(void)
+{
+    /* Next line, tries to move value 0 to CR3 register. This register is a privileged one, and so it will raise an exception */
+     /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
+
+
+
+	// se dibuja un frame antes del while(1)
+		show_map();
 
   while(1) { 
-		bef = gettime();
+		// se incrementa cada iteracion un frame nuevo
+		//frames++;
 
 		// procesar movimientos
 
-		aft = gettime();
-		mostrar_fps(bef, aft);
+		//mostrar_fps();
+		//frames = 0;
 	}
 }

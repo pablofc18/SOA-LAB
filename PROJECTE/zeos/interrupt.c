@@ -148,6 +148,19 @@ void handle_pf_cow(unsigned long log_pg) {
 		int pag = PAG_LOG_INIT_DATA + NUM_PAG_DATA;
 		// search empty space
 		while (pag < TOTAL_PAGES && pt[pag].bits.present == 1) pag++;
+	/*	
+		page_table_entry pt_tmp;
+		int tmp_pag = -1;
+		
+		if (pag >= TOTAL_PAGES) {
+			for (pag = PAG_LOG_INIT_DATA+NUM_PAG_DATA; pag < TOTAL_PAGES; ++pag) {
+				if (pt[pag].bits.present == 1 && phys_mem[pt[pag].bits.pbase_addr] == 1 && pt[pag].bits.rw == 1) {
+					
+				}
+			}
+		}
+		*/
+	
 		// map new frame in new page
 		set_ss_pag(pt, pag, nw_phf);
 		// copy data in that new frame
