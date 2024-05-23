@@ -145,23 +145,14 @@ void handle_pf_cow(unsigned long log_pg) {
 	unsigned long phys_addr = get_frame(pt, log_pg);
 	if (phys_mem[phys_addr] > 1) {
 		int nw_phf = alloc_frame();	
-		int pag = PAG_LOG_INIT_DATA + NUM_PAG_DATA;
-		// search empty space
-		while (pag < TOTAL_PAGES && pt[pag].bits.present == 1) pag++;
-	/*	
-		page_table_entry pt_tmp;
-		int tmp_pag = -1;
-		
-		if (pag >= TOTAL_PAGES) {
-			for (pag = PAG_LOG_INIT_DATA+NUM_PAG_DATA; pag < TOTAL_PAGES; ++pag) {
-				if (pt[pag].bits.present == 1 && phys_mem[pt[pag].bits.pbase_addr] == 1 && pt[pag].bits.rw == 1) {
-					
-				}
-			}
-		}
-		*/
-	
-		// map new frame in new page
+
+		// pag que siempre reemplazaremos momentaneamente (random)
+		int pag = PAG_LOG_INIT_DATA+NUM_PAG_DATA+1;	
+		page_table_entry tmp;
+		tmp.entry = pt[pag].entry;
+		pt[pag].entry=0;
+
+		// machacamos esa pag en current
 		set_ss_pag(pt, pag, nw_phf);
 		// copy data in that new frame
 		copy_data((void*)(log_pg<<12),(void*)(pag<<12), PAGE_SIZE);
@@ -170,7 +161,11 @@ void handle_pf_cow(unsigned long log_pg) {
 		// map new phys frame on data	
 		set_ss_pag(pt,log_pg,nw_phf);
 		// delete previos map to pag
-		del_ss_pag(pt, pag);
+		del_ss_pag(pt, pag); 
+		
+		// restauramos la pag
+		pt[pag].entry = tmp.entry;
+
 		// flush tlb
 		set_cr3(get_DIR(current()));
 	}

@@ -4,7 +4,7 @@ char buff[24];
 
 int pid;
 
-float lasttime=0.0f;
+int lasttime=0.0f;
 int frames = 0;
 float fps = 0.0f;
 
@@ -13,23 +13,20 @@ void mostrar_fps() {
 	set_color(2,0);
 	write(1,"fps: ",4);
 
-	float currenttime=gettime();	
-	gotoxy(30, 0);
-if (currenttime>0.00) write(1,"T",1);
-	itoa(currenttime,buff);
-	write(1,buff,strlen(buff));
-	float tickselapsed=currenttime-lasttime;
+	int currenttime=gettime();	
+	float tickselapsed=(float)currenttime-(float)lasttime;
 	
 	float secselapsed=tickselapsed/18.0f;
-	if (secselapsed>=1.0) {
 	fps = (float) frames/secselapsed;
 	
-	frames = 0;
-	lasttime=currenttime;
-
-	itoa(fps,buff);
+	// Se puede o bien poner a cero y actualizar lasttime o bien
+	// que siga corriendo valor de fps no se vera afectado
+	//frames = 0;
+	//lasttime=currenttime;
+	
+	int i_fps = (int) fps;
+	itoa(i_fps,buff);
 	write(1,buff,strlen(buff));
-	}
 }
 
 void show_map() {
@@ -98,18 +95,26 @@ int __attribute__ ((__section__(".text.main")))
     /* Next line, tries to move value 0 to CR3 register. This register is a privileged one, and so it will raise an exception */
      /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
 
+// PAGE FAULT NORMAL
+	/*char*p=0;
+	*p='x';*/
 
+// PAGE FAULT COW
+	/*char *c = "CCCC";
+	if (fork() > 0) {
+		int x = 2;
+		if (x%2==0) write(1,c,strlen(c));
+		exit();
+	} else {
+		char *b = "HOLA";
+		write(1,b,strlen(b));
+	}*/
 
-	// se dibuja un frame antes del while(1)
-		show_map();
+	lasttime = gettime();
+	show_map();
 
   while(1) { 
-		// se incrementa cada iteracion un frame nuevo
-		//frames++;
-
-		// procesar movimientos
-
+	  //show_map();
 		//mostrar_fps();
-		//frames = 0;
 	}
 }
