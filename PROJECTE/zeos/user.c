@@ -95,12 +95,12 @@ int __attribute__ ((__section__(".text.main")))
     /* Next line, tries to move value 0 to CR3 register. This register is a privileged one, and so it will raise an exception */
      /* __asm__ __volatile__ ("mov %0, %%cr3"::"r" (0) ); */
 
-// PAGE FAULT NORMAL
+// Page fault normal
 	/*char*p=0;
 	*p='x';*/
 
-// PAGE FAULT COW
-	/*char *c = "CCCC";
+// Page fault CoW
+/*	char *c = "CCCC";
 	if (fork() > 0) {
 		int x = 2;
 		if (x%2==0) write(1,c,strlen(c));
@@ -108,8 +108,8 @@ int __attribute__ ((__section__(".text.main")))
 	} else {
 		char *b = "HOLA";
 		write(1,b,strlen(b));
-	}*/
-
+	}
+*/
 	lasttime = gettime();
 	show_map();
 

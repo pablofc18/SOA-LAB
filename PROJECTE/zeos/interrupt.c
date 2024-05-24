@@ -136,7 +136,7 @@ extern Byte phys_mem[TOTAL_PAGES];
 
 int is_cow_pf(unsigned long log_pg) {
 	page_table_entry * pt = get_PT(current());
-	if (pt[log_pg].bits.rw == 0) return 1;
+	if (log_pg >= PAG_LOG_INIT_DATA && log_pg < PAG_LOG_INIT_DATA+NUM_PAG_DATA && pt[log_pg].bits.rw == 0) return 1;
 	return 0;
 }
 

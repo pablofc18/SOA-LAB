@@ -119,7 +119,9 @@ sysenter_fin:
 	sysexit
 
 ENTRY(pf_handler)
+	SAVE_ALL
 	call pf_routine
+	RESTORE_ALL
 	// param
 	addl $4, %esp
 	iret
